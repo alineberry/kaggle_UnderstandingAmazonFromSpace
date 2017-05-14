@@ -3,7 +3,7 @@
 
 # # Exploratory Data Analysis
 
-# In[1]:
+# In[39]:
 
 import pandas as pd
 import numpy as np
@@ -13,7 +13,8 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import seaborn as sns
 from skimage.io import imread, imshow
-from skimage import transform, img_as_float
+from skimage import transform, img_as_float, filters
+from skimage.color import rgb2gray
 import glob
 import math
 from importlib import reload
@@ -33,7 +34,7 @@ del cwd, path
 import KaggleAmazonMain
 
 
-# In[29]:
+# In[65]:
 
 reload(KaggleAmazonMain)
 
@@ -126,10 +127,27 @@ for i in range(0,3):
     KaggleAmazonMain.plot_rgb_dist(X_train[sample[0],:,:,:],tags)
 
 
-# In[36]:
+# In[43]:
 
-sample = np.random.randint(low=0, high=X_train.shape[0]-1, size = 1)
-sample[0]
-ind = names_train[sample[0]]
-ind
+imshow(filters.sobel(rgb2gray(X_train[0,:,:,:])), cmap='gray')
+
+
+# In[47]:
+
+X_train_g = rgb2gray(X_train)
+
+X_train_sobel = []
+for i in range(X_train_g.shape[0]):
+    X_train_sobel.append(filters.sobel(X_train_g[i]))
+X_train_sobel = np.asarray(X_train_sobel)
+
+
+# In[67]:
+
+KaggleAmazonMain.plot_samples(X_train_sobel, names_train, tagged_df, 4,4)
+
+
+# In[66]:
+
+X_train_sobel = KaggleAmazonMain.xform_to_sobel(X_train)
 

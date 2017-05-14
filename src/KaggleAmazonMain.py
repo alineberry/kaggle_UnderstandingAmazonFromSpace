@@ -5,9 +5,11 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import seaborn as sns
 from skimage.io import imread, imshow
-from skimage import transform, img_as_float
+from skimage import transform, img_as_float, filters
+from skimage.color import rgb2gray
 import glob
 import math
+import scipy
 
 
 def load_training_data(ftype='jpg'):
@@ -45,7 +47,7 @@ def load_training_data(ftype='jpg'):
         
         labels_temp = tagged_df.loc[imname]
         labels.append(labels_temp)
-    train_imgs = np.asarray(train_imgs)
+    train_imgs = img_as_float(np.asarray(train_imgs))
     return train_imgs, labels, im_names, tagged_df
 
     
@@ -98,5 +100,53 @@ def plot_rgb_dist(img, title):
     plt.suptitle(title, fontsize=20)
     plt.axis('off')
 
+def xform_to_gray(imgs):
+    return rgb2gray(imgs)
 
+def xform_to_sobel(imgs):
+    imgs = xform_to_gray(imgs)
+    sobels = []
+    for i in range(imgs.shape[0]):
+        sobels.append(filters.sobel(imgs[i]))
+    return np.asarray(sobels)
+
+def get_features(imgs):
+    r_mean = []
+    g_mean = []
+    b_mean = []
+
+    r_std = []
+    g_std = []
+    b_std = []
+
+    r_max = []
+    g_max = []
+    b_max = []
+
+    r_min = []
+    g_min = []
+    b_min = []
+
+    r_kurtosis = []
+    g_kurtosis = []
+    b_kurtosis = []
+    
+    r_skew = []
+    g_skew = []
+    b_skew = []
+    
+    sobel_mean = []
+    sobel_std = []
+    sobel_max = []
+    sobel_min = []
+    sobel_kurtosis = []
+    sobel_skew = []
+    
+    sobel_rowmean_std = []
+    sobel_colmean_std = []
+    
+    # METRIC FOR BIMODALITY
+    # bin each color intensity (histogram)
+    # find 2 most populated bins
+    # subtract and abs() to quantify bimodality
 
