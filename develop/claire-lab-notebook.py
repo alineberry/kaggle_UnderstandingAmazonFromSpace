@@ -32,17 +32,17 @@ del cwd, path
 import KaggleAmazonMain as kam
 
 
-# In[4]:
+# In[10]:
 
-X_train, y_train, im_names, tagged_df = kam.load_training_data()
+X_train, y_train, names_train, tagged_df = kam.load_training_data()
 
 
-# In[5]:
+# In[11]:
 
 tagged_df.head()
 
 
-# In[9]:
+# In[12]:
 
 #Barplot of tag counts
 get_ipython().magic('matplotlib inline')
@@ -54,66 +54,55 @@ plt.show()
 tagged_df.sum().sort_values(ascending=False)
 
 
-# # Load Image Data
-
-# In[10]:
+# In[16]:
 
 # 100 files, images are 256x256 pixels, with a channel dimension size 3 = RGB
 print('X_train is a {} object'.format(type(X_train)))
 print('it has shape {}'.format(X_train.shape))
-
-
-# In[11]:
 
 print('y_train is a {} object'.format(type(y_train)))
 print('it has {} elements'.format(len(y_train)))
 print('each element is of type {}'.format(type(y_train[0])))
 print('and the elements are of size {}'.format(y_train[0].shape))
 
-
-# In[12]:
-
 print('names_train is a {} object'.format(type(names_train)))
 print('it has {} elements'.format(len(names_train)))
 print('each element is of type {}'.format(type(names_train)))
 
 
-# In[ ]:
+# In[20]:
 
-plot_samples(4,4)
+kam.plot_samples(X_train, names_train, tagged_df, nrow=4, ncol=4)
 
 
 # # Feature Engineering
 # What type of features are we working with here?
+# Feature engineering explores the feature data, and does feature creation.
+# Each image consists of pixel values in red, geen, and blue color schemes. The patterns in these pixels will  have useful trends for classifying the objects in the images and the image types. Notice how the statistical distributions of the red, green, and blue, pixels differ for different types of tags.
 
-# In[113]:
+# In[39]:
 
-fig, axes = plt.subplots(1, 3, figsize=(15, 12))
-axes[0].imshow(X_train[0,:,:,0], cmap='gray')
-axes[1].imshow(X_train[0,:,:,1])
-axes[2].imshow(X_train[0,:,:,2])
-plt.axis('off')
-
-
-# In[99]:
-
-pics = ['train_10039', 'train_10059', 'train_10034']
+fig, axes = plt.subplots(1, 3, figsize=(10, 6))
+axes[0].imshow(X_train[1,:,:,0], cmap='Reds')
+axes[1].imshow(X_train[1,:,:,1], cmap='Greens')
+axes[2].imshow(X_train[1,:,:,2], cmap='Blues')
 
 
-# In[141]:
+# In[40]:
 
 plt.subplots_adjust(wspace=0, hspace=0)
 for i in range(0,3):
     sample = np.random.randint(low=0, high=X_train.shape[0]-1, size = 1)
     ind = names_train[sample[0]]
-    tags = get_labels(ind)
-    plot_rgb_dist(X_train[sample[0],:,:,:],tags)
+    tags = kam.get_labels(ind, tagged_df)
+    kam.plot_rgb_dist(X_train[sample[0],:,:,:],tags)
 
 
-# In[86]:
+# ## Feature Creation
+# Create features from the raw pixel data. These metrics should be metrics that describe patterns in the trends and distributions of the pixels. 
+# Using binned historgram features to capture bimodality and general shape and location of distributions in red, green, and blue.
 
-sample = np.random.randint(low=0, high=X_train.shape[0]-1, size = 1)
-sample[0]
-ind = names_train[sample[0]]
-ind
+# In[ ]:
+
+
 
