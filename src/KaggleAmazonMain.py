@@ -32,7 +32,7 @@ def load_training_data(ftype='jpg'):
     labels = []
     im_names = []
     print('Loading {} image dataset'.format(ftype))
-    path = os.path.join('data','train-{}-sample'.format(ftype),'*.'+ftype)
+    path = os.path.join(cwd, '..', 'data','train-{}-sample'.format(ftype),'*.'+ftype)
     files = glob.glob(path)
     for fs in files:
         img = imread(fs)
