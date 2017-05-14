@@ -11,22 +11,22 @@ import math
 
 
 def load_training_data(ftype='jpg'):
+    """Returns (train_imgs, labels, im_names, tagged_df)"""
+    cwd = os.getcwd()
 
-	cwd = os.getcwd()
+    #open data from current directory. Should work with any direcotry path
+    with open(os.path.join(cwd, "..", "data", "train.csv")) as file:
+        tagged_df = pd.read_csv(file)
 
-	#open data from current directory. Should work with any direcotry path
-	with open(os.path.join(cwd, "data", "train.csv")) as file:
-		tagged_df = pd.read_csv(file)
+    #split the tags into new rows
+    tagged_df = pd.DataFrame(tagged_df.tags.str.split(' ').tolist(), index=tagged_df.image_name).stack()
+    tagged_df = tagged_df.reset_index()[[0, 'image_name']] # dataframe with two columns
+    tagged_df.columns = ['tags', 'image_name'] # rename columns
+    tagged_df.set_index('image_name', inplace=True) # rest index to image_name again
 
-	#split the tags into new rows
-	tagged_df = pd.DataFrame(tagged_df.tags.str.split(' ').tolist(), index=tagged_df.image_name).stack()
-	tagged_df = tagged_df.reset_index()[[0, 'image_name']] # dataframe with two columns
-	tagged_df.columns = ['tags', 'image_name'] # rename columns
-	tagged_df.set_index('image_name', inplace=True) # rest index to image_name again
-
-	#create dummy variables for each tag
-	tagged_df = pd.get_dummies(tagged_df['tags']) # creates dummy rows
-	tagged_df = tagged_df.groupby(tagged_df.index).sum() # adds dummy rows together by image_name index
+    #create dummy variables for each tag
+    tagged_df = pd.get_dummies(tagged_df['tags']) # creates dummy rows
+    tagged_df = tagged_df.groupby(tagged_df.index).sum() # adds dummy rows together by image_name index
 
     train_imgs = []
     labels = []
@@ -45,16 +45,16 @@ def load_training_data(ftype='jpg'):
         labels_temp = tagged_df.loc[imname]
         labels.append(labels_temp)
     train_imgs = np.asarray(train_imgs)
-    return train_imgs, labels, im_names
+    return train_imgs, labels, im_names, tagged_df
 
-	
+    
 def get_labels(fname, tagged_df):
-	"""return list of labels for a given filename"""
+    """return list of labels for a given filename"""
     return ", ".join(tagged_df.loc[fname][tagged_df.loc[fname]==1].index.tolist())    
 
 
 def plot_samples(X_train, nrow, ncol):
-	"""Plots random sample images with their titles and tag names"""
+    """Plots random sample images with their titles and tag names"""
     sampling = np.random.randint(low=0, high=X_train.shape[0]-1, size = nrow*ncol)
     fig, axes = plt.subplots(nrow, ncol, figsize=(15, 12))
     for i in range(0,len(sampling)):
@@ -76,17 +76,16 @@ def plot_samples(X_train, nrow, ncol):
 
 
 def get_rgb_vectors(X_train):
-	"""Returns RBG vectors for each image in the training set (return as tuple)"""
-	print("There are {} unique features per image".format((X_train.shape[1]*X_train.shape[2])*X_train.shape[3]))
-	red = X_train[:,:,:,0].reshape(X_train.shape[0], X_train.shape[1]*X_train.shape[2]) # row of red pixel features for all images
-	green = X_train[:,:,:,1].reshape(X_train.shape[0], X_train.shape[1]*X_train.shape[2]) # row of blue pixel features for all images
-	blue = X_train[:,:,:,2].reshape(X_train.shape[0], X_train.shape[1]*X_train.shape[2]) #row of green pixel features for all images
-	
-	return (red, green, blue)
-	
+    """Returns RBG vectors for each image in the training set (return as tuple)"""
+    print("There are {} unique features per image".format((X_train.shape[1]*X_train.shape[2])*X_train.shape[3]))
+    red = X_train[:,:,:,0].reshape(X_train.shape[0], X_train.shape[1]*X_train.shape[2]) # row of red pixel features for all images
+    green = X_train[:,:,:,1].reshape(X_train.shape[0], X_train.shape[1]*X_train.shape[2]) # row of blue pixel features for all images
+    blue = X_train[:,:,:,2].reshape(X_train.shape[0], X_train.shape[1]*X_train.shape[2]) #row of green pixel features for all images
+    return red, green, blue
+    
 
 def plot_rgb_dist(img, title):
-	"""Plots the RGB kde for a given image. Image title passed in as argument (image labels perhaps)"""
+    """Plots the RGB kde for a given image. Image title passed in as argument (image labels perhaps)"""
     plt.subplots_adjust(wspace=0, hspace=0)
     fig = plt.figure(figsize=(18, 3))
     ax = fig.add_subplot(1,2,1)
