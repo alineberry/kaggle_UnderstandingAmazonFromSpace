@@ -13,6 +13,7 @@ import math
 def load_training_data(ftype='jpg'):
     """Returns (train_imgs, labels, im_names, tagged_df)"""
     cwd = os.getcwd()
+    print("cwd",cwd)
 
     #open data from current directory. Should work with any direcotry path
     with open(os.path.join(cwd, "..", "data", "train.csv")) as file:
@@ -32,7 +33,7 @@ def load_training_data(ftype='jpg'):
     labels = []
     im_names = []
     print('Loading {} image dataset'.format(ftype))
-    path = os.path.join('data','train-{}-sample'.format(ftype),'*.'+ftype)
+    path = os.path.join(cwd, '..', 'data','train-{}-sample'.format(ftype),'*.'+ftype)
     files = glob.glob(path)
     for fs in files:
         img = imread(fs)
@@ -53,13 +54,13 @@ def get_labels(fname, tagged_df):
     return ", ".join(tagged_df.loc[fname][tagged_df.loc[fname]==1].index.tolist())    
 
 
-def plot_samples(X_train, nrow, ncol):
+def plot_samples(X_train, names_train, tagged_df, nrow, ncol):
     """Plots random sample images with their titles and tag names"""
     sampling = np.random.randint(low=0, high=X_train.shape[0]-1, size = nrow*ncol)
     fig, axes = plt.subplots(nrow, ncol, figsize=(15, 12))
     for i in range(0,len(sampling)):
         name = names_train[sampling[i]]
-        tags = get_labels(name)
+        tags = get_labels(name, tagged_df)
 
         row = math.floor(i/ncol)
         col = i - math.floor(i/ncol)*ncol
