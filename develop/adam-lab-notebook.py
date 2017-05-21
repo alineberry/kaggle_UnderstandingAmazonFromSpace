@@ -3,7 +3,7 @@
 
 # # Exploratory Data Analysis
 
-# In[39]:
+# In[27]:
 
 import pandas as pd
 import numpy as np
@@ -18,6 +18,7 @@ from skimage.color import rgb2gray
 import glob
 import math
 from importlib import reload
+import scipy
 
 
 # In[2]:
@@ -34,27 +35,27 @@ del cwd, path
 import KaggleAmazonMain
 
 
-# In[65]:
+# In[66]:
 
 reload(KaggleAmazonMain)
 
 
-# In[26]:
+# In[5]:
 
 X_train, y_train, names_train, tagged_df = KaggleAmazonMain.load_training_data()
 
 
-# In[15]:
+# In[6]:
 
 X_train.shape
 
 
-# In[16]:
+# In[7]:
 
 tagged_df.head()
 
 
-# In[17]:
+# In[8]:
 
 #Barplot of tag counts
 get_ipython().magic('matplotlib inline')
@@ -68,19 +69,19 @@ tagged_df.sum().sort_values(ascending=False)
 
 # # Load Image Data
 
-# In[18]:
+# In[9]:
 
 len(y_train)
 
 
-# In[19]:
+# In[10]:
 
 # 100 files, images are 256x256 pixels, with a channel dimension size 3 = RGB
 print('X_train is a {} object'.format(type(X_train)))
 print('it has shape {}'.format(X_train.shape))
 
 
-# In[20]:
+# In[11]:
 
 print('y_train is a {} object'.format(type(y_train)))
 print('it has {} elements'.format(len(y_train)))
@@ -88,14 +89,14 @@ print('each element is of type {}'.format(type(y_train[0])))
 print('and the elements are of size {}'.format(y_train[0].shape))
 
 
-# In[21]:
+# In[12]:
 
 print('names_train is a {} object'.format(type(names_train)))
 print('it has {} elements'.format(len(names_train)))
 print('each element is of type {}'.format(type(names_train)))
 
 
-# In[30]:
+# In[13]:
 
 KaggleAmazonMain.plot_samples(X_train, names_train, tagged_df, 4,4)
 
@@ -103,7 +104,7 @@ KaggleAmazonMain.plot_samples(X_train, names_train, tagged_df, 4,4)
 # # Feature Engineering
 # What type of features are we working with here?
 
-# In[31]:
+# In[14]:
 
 fig, axes = plt.subplots(1, 3, figsize=(15, 12))
 axes[0].imshow(X_train[0,:,:,0], cmap='gray')
@@ -112,12 +113,12 @@ axes[2].imshow(X_train[0,:,:,2])
 plt.axis('off')
 
 
-# In[32]:
+# In[15]:
 
 pics = ['train_10039', 'train_10059', 'train_10034']
 
 
-# In[35]:
+# In[16]:
 
 plt.subplots_adjust(wspace=0, hspace=0)
 for i in range(0,3):
@@ -127,12 +128,12 @@ for i in range(0,3):
     KaggleAmazonMain.plot_rgb_dist(X_train[sample[0],:,:,:],tags)
 
 
-# In[43]:
+# In[17]:
 
 imshow(filters.sobel(rgb2gray(X_train[0,:,:,:])), cmap='gray')
 
 
-# In[47]:
+# In[18]:
 
 X_train_g = rgb2gray(X_train)
 
@@ -142,12 +143,67 @@ for i in range(X_train_g.shape[0]):
 X_train_sobel = np.asarray(X_train_sobel)
 
 
-# In[67]:
+# In[19]:
 
 KaggleAmazonMain.plot_samples(X_train_sobel, names_train, tagged_df, 4,4)
 
 
-# In[66]:
+# In[20]:
 
 X_train_sobel = KaggleAmazonMain.xform_to_sobel(X_train)
+
+
+# In[73]:
+
+len(y_train)
+
+
+# In[78]:
+
+pd.DataFrame(y_train)
+
+
+# In[63]:
+
+features = KaggleAmazonMain.get_features(X_train)
+
+
+# In[64]:
+
+X_train[0].shape
+
+
+# In[65]:
+
+features.head()
+
+
+# In[30]:
+
+features.describe()
+
+
+# In[79]:
+
+from sklearn.ensemble import RandomForestClassifier
+
+
+# In[82]:
+
+len(features)
+
+
+# In[83]:
+
+y_train_df = pd.DataFrame(y_train)
+
+
+# In[85]:
+
+len(y_train_df)
+
+
+# In[ ]:
+
+rf = RandomForestClassifier()
 

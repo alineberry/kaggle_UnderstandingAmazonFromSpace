@@ -13,7 +13,16 @@ import scipy
 
 
 def load_training_data(ftype='jpg'):
-    """Returns (train_imgs, labels, im_names, tagged_df)"""
+    """
+    Returns (train_imgs, labels, im_names, tagged_df)
+    
+    - train_imgs is a numpy array size (N x 256 x 256 x 3)
+    - labels is a list of pandas series, containing label dummy vectors for each image in train_images
+      labels could be smaller than tagged_df if only a sample of images is loaded
+    - im_names is a list of strings containing the filenames with extension removed
+    - tagged_df is a dictionary of all image names and their tags. it is returned as a pandas dataframe
+    """
+    
     cwd = os.getcwd()
     print("cwd",cwd)
 
@@ -106,11 +115,16 @@ def xform_to_gray(imgs):
 def xform_to_sobel(imgs):
     imgs = xform_to_gray(imgs)
     sobels = []
-    for i in range(imgs.shape[0]):
-        sobels.append(filters.sobel(imgs[i]))
+    if imgs.ndim == 2:
+        sobels.append(filters.sobel(imgs))
+    else:
+        for i in range(imgs.shape[0]):
+            sobels.append(filters.sobel(imgs[i]))
     return np.asarray(sobels)
 
 def get_features(imgs):
+    """Input is a Nx256x256x3 numpy array of images, where N is number of images"""
+        
     r_mean = []
     g_mean = []
     b_mean = []
@@ -150,3 +164,71 @@ def get_features(imgs):
     # find 2 most populated bins
     # subtract and abs() to quantify bimodality
 
+    for i in range(imgs.shape[0]):
+        
+        r = imgs[:,:,0].ravel()
+        g = imgs[:,:,1].ravel()
+        b = imgs[:,:,2].ravel()
+                
+        s = KaggleAmazonMain.xform_to_sobel(imgs[i])
+        
+        r_mean.append(np.mean(r))
+        g_mean.append(np.mean(g))
+        b_mean.append(np.mean(b))
+        
+        r_std.append(np.std(r))
+        g_std.append(np.std(g))
+        b_std.append(np.std(b))
+        
+        r_max.append(np.max(r))
+        b_max.append(np.max(b))
+        g_max.append(np.max(g))
+        
+        r_min.append(np.min(r))
+        b_min.append(np.min(b))
+        g_min.append(np.min(g))
+        
+        r_kurtosis.append(scipy.stats.kurtosis(r))
+        b_kurtosis.append(scipy.stats.kurtosis(b))
+        g_kurtosis.append(scipy.stats.kurtosis(g))
+        
+        r_skew.append(scipy.stats.skew(r))
+        b_skew.append(scipy.stats.skew(b))
+        g_skew.append(scipy.stats.skew(g))
+        
+        sobel_mean.append(np.mean(s.ravel()))
+        sobel_std.append(np.std(s.ravel()))
+        sobel_max.append(np.max(s.ravel()))
+        sobel_min.append(np.min(s.ravel()))
+        sobel_kurtosis.append(scipy.stats.kurtosis(s.ravel()))
+        sobel_skew.append(scipy.stats.skew(s.ravel()))
+        
+        sobel_rowmean_std.append(np.std(np.mean(s,axis=1)))
+        sobel_colmean_std.append(np.std(np.mean(s,axis=0)))
+        
+                      
+    return pd.DataFrame(
+        {'r_mean':r_mean, 'g_mean':g_mean, 'b_mean':b_mean,
+         'r_std':r_std, 'g_std':g_std, 'b_std':b_std,
+         'r_max':r_max, 'g_max':g_max, 'b_max':b_max,
+         'r_min':r_min, 'g_min':g_min, 'b_min':b_min,
+         'r_kurtosis':r_kurtosis, 'g_kurtosis':g_kurtosis, 'b_kurtosis':b_kurtosis,
+         'r_skew':r_skew, 'g_skew':g_skew, 'b_skew':b_skew,
+         'sobel_mean':sobel_mean, 'sobel_std':sobel_std, 
+         'sobel_max':sobel_max, 'sobel_min':sobel_min,
+         'sobel_kurtosis':sobel_kurtosis, 'sobel_skew':sobel_skew,
+         'sobel_rowmean_std':sobel_rowmean_std, 'sobel_colmean_std':sobel_colmean_std})
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
