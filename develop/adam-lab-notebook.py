@@ -205,5 +205,11 @@ len(y_train_df)
 
 # In[ ]:
 
-rf = RandomForestClassifier()
+rf = RandomForestClassifier(n_estimators = 10, 
+                            max_features = 'sqrt',
+                            bootstrap = True, 
+                            oob_score = True,
+                            n_jobs = -1,
+                            
+                           )
 
