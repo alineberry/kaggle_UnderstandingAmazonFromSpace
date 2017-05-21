@@ -218,6 +218,42 @@ def get_features(imgs):
          'sobel_max':sobel_max, 'sobel_min':sobel_min,
          'sobel_kurtosis':sobel_kurtosis, 'sobel_skew':sobel_skew,
          'sobel_rowmean_std':sobel_rowmean_std, 'sobel_colmean_std':sobel_colmean_std})
+
+def binned_mode_features(img, steps):
+    ## red ##
+    #split on mean
+    m=img[:,:,0].flatten().mean()
+    left = img[:,:,0].flatten()[img[:,:,0].flatten()<m]
+    right = img[:,:,0].flatten()[img[:,:,0].flatten()>=m]
+    #find mode in left and right
+    max_ind_left = np.histogram(left, bins=steps, density=False)[0].argsort()[-1:]
+    max_ind_right = np.histogram(right, bins=steps, density=False)[0].argsort()[-1:]
+    #calc bimodal metric
+    mo1 = np.histogram(right, bins=steps, density=False)[1][max_ind_right]
+    mo2 = np.histogram(left, bins=steps, density=False)[1][max_ind_left]
+    mods_diff_r=abs(mo1-mo2)
+
+    ## green ##
+    m=img[:,:,1].flatten().mean()
+    left = img[:,:,1].flatten()[img[:,:,1].flatten()<m]
+    right = img[:,:,1].flatten()[img[:,:,1].flatten()>=m]
+    max_ind_left = np.histogram(left, bins=steps, density=False)[0].argsort()[-1:]
+    max_ind_right = np.histogram(right, bins=steps, density=False)[0].argsort()[-1:]
+    mo1 = np.histogram(right, bins=steps, density=False)[1][max_ind_right]
+    mo2 = np.histogram(left, bins=steps, density=False)[1][max_ind_left]
+    mods_diff_g=abs(mo1-mo2)
+
+    ## blue ##
+    m=img[:,:,2].flatten().mean()
+    left = img[:,:,2].flatten()[img[:,:,2].flatten()<m]
+    right = img[:,:,2].flatten()[img[:,:,2].flatten()>=m]
+    max_ind_left = np.histogram(left, bins=steps, density=False)[0].argsort()[-1:]
+    max_ind_right = np.histogram(right, bins=steps, density=False)[0].argsort()[-1:]
+    mo1 = np.histogram(right, bins=steps, density=False)[1][max_ind_right]
+    mo2 = np.histogram(left, bins=steps, density=False)[1][max_ind_left]
+    mods_diff_b=abs(mo1-mo2)
+
+    return mods_diff_r, mods_diff_g, mods_diff_b
                       
                       
                       
