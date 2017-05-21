@@ -43,10 +43,30 @@ reload(KaggleAmazonMain)
 
 # Load from pickle unless something has changed:
 
-# In[19]:
+# In[60]:
 
 X_train = pd.read_pickle('X_train.pkl')
 y_train = pd.read_pickle('y_train.pkl')
+
+
+# In[62]:
+
+type(y_train)
+
+
+# In[64]:
+
+y_train.describe()
+
+
+# In[65]:
+
+tagged_df.describe()
+
+
+# In[68]:
+
+tagged_df.ix[tagged_df['cultivation']==2]
 
 
 # Below cell will recreate the feature matrix. Use with caution as this may take around 30 minutes to complete.
@@ -54,6 +74,8 @@ y_train = pd.read_pickle('y_train.pkl')
 # In[4]:
 
 # X_train, y_train, names_train, tagged_df = KaggleAmazonMain.load_training_data(sampleOnly=False)
+# X_train.to_pickle('X_train.pkl')
+# y_train.to_pickle('y_train.pkl')
 
 
 # In[13]:
@@ -74,12 +96,6 @@ y_train
 # In[17]:
 
 y_train.describe()
-
-
-# In[18]:
-
-X_train.to_pickle('X_train.pkl')
-y_train.to_pickle('y_train.pkl')
 
 
 # ### See distribution of label counts. Note a significant imbalance.
@@ -158,31 +174,62 @@ KaggleAmazonMain.plot_samples(X_train_sobel, names_train, tagged_df, 4,4)
 
 # # Develop predictive models
 
-# In[22]:
+# In[37]:
 
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
 
 
-# In[105]:
+# In[76]:
 
-rf = RandomForestClassifier(n_estimators = 10, 
+rf = RandomForestClassifier(n_estimators = 100, 
                             max_features = 'sqrt',
                             bootstrap = True, 
                             oob_score = True,
-                            n_jobs = -1)
+                            n_jobs = -1,
+                            random_state = 14113,
+                            class_weight = 'balanced')
 
 
-# In[106]:
+# In[77]:
 
-rf.fit(features, y_train_df)
-
-
-# In[114]:
-
-rf.predict(features)[0,:]
+y_train[y_train > 1] = 1
 
 
-# In[115]:
+# In[78]:
 
-y_train[0]
+X_train, X_validation, y_train, y_validation = train_test_split(X_train, y_train, test_size=0.40, random_state=14113)
+
+
+# In[79]:
+
+rf.fit(X_train, y_train)
+
+
+# In[80]:
+
+predictions = rf.predict(X_validation)
+
+
+# In[81]:
+
+from sklearn.metrics import fbeta_score
+
+
+# In[51]:
+
+np.asarray(y_validation)
+
+
+# ### there were 9 test observations which were given no predictions (labels)
+
+# In[99]:
+
+zeros = pd.DataFrame(np.sum(predictions,axis=1))
+sum(np.asarray(zeros) == 0)
+
+
+# In[82]:
+
+fbeta_score(np.asarray(y_validation), predictions, beta=2, average='samples')
 
