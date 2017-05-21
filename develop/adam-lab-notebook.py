@@ -41,9 +41,19 @@ reload(KaggleAmazonMain)
 
 # # Load training image data
 
+# Load from pickle unless something has changed:
+
+# In[19]:
+
+X_train = pd.read_pickle('X_train.pkl')
+y_train = pd.read_pickle('y_train.pkl')
+
+
+# Below cell will recreate the feature matrix. Use with caution as this may take around 30 minutes to complete.
+
 # In[4]:
 
-X_train, y_train, names_train, tagged_df = KaggleAmazonMain.load_training_data(sampleOnly=False)
+# X_train, y_train, names_train, tagged_df = KaggleAmazonMain.load_training_data(sampleOnly=False)
 
 
 # In[13]:
@@ -51,7 +61,7 @@ X_train, y_train, names_train, tagged_df = KaggleAmazonMain.load_training_data(s
 X_train.head()
 
 
-# In[15]:
+# In[21]:
 
 X_train.describe()
 
@@ -64,6 +74,12 @@ y_train
 # In[17]:
 
 y_train.describe()
+
+
+# In[18]:
+
+X_train.to_pickle('X_train.pkl')
+y_train.to_pickle('y_train.pkl')
 
 
 # ### See distribution of label counts. Note a significant imbalance.
@@ -142,7 +158,7 @@ KaggleAmazonMain.plot_samples(X_train_sobel, names_train, tagged_df, 4,4)
 
 # # Develop predictive models
 
-# In[79]:
+# In[22]:
 
 from sklearn.ensemble import RandomForestClassifier
 
