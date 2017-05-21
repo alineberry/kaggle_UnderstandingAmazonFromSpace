@@ -12,12 +12,12 @@ import math
 import scipy
 
 
-def load_training_data(ftype='jpg'):
+def load_training_data(sampleOnly=True, ftype='jpg'):
     """
-    Returns (train_imgs, labels, im_names, tagged_df)
+    Returns (train_imgs, labels, im_names, tagged_df). Set sampleOnly to False in order to load the full training set.
     
     - train_imgs is a numpy array size (N x 256 x 256 x 3)
-    - labels is a list of pandas series, containing label dummy vectors for each image in train_images
+    - labels is a pandas dataframe, containing label dummy vectors for each image in train_images
       labels could be smaller than tagged_df if only a sample of images is loaded
     - im_names is a list of strings containing the filenames with extension removed
     - tagged_df is a dictionary of all image names and their tags. it is returned as a pandas dataframe
@@ -40,24 +40,37 @@ def load_training_data(ftype='jpg'):
     tagged_df = pd.get_dummies(tagged_df['tags']) # creates dummy rows
     tagged_df = tagged_df.groupby(tagged_df.index).sum() # adds dummy rows together by image_name index
 
-    train_imgs = []
+    X_train = []
     labels = []
     im_names = []
-    print('Loading {} image dataset'.format(ftype))
-    path = os.path.join(cwd, '..', 'data','train-{}-sample'.format(ftype),'*.'+ftype)
+    
+    if sampleOnly:
+        print('Loading SAMPLE {} image dataset'.format(ftype))
+        path = os.path.join(cwd, '..', 'data','train-{}-sample'.format(ftype),'*.'+ftype)
+    else:
+        print('Loading FULL {} image dataset'.format(ftype))
+        path = os.path.join(cwd, '..', 'data','train-{}'.format(ftype),'*.'+ftype)
     files = glob.glob(path)
+    print('number of files: ', len(files))
+    i = 0
     for fs in files:
-        img = imread(fs)
+        i += 1
+        if i % 1000 == 0:
+            print('processing {} of {}'.format(i,len(files)))
+        img = img_as_float(imread(fs))
         # img = transform.resize(img, output_shape=(h,w,d), preserve_range=True)  if needed
-        train_imgs.append(img)
+        #X_train.append(img)
+        
+        X_train.append(get_features(img))
         
         imname = os.path.basename(fs).split('.')[0]
         im_names.append(imname)
         
         labels_temp = tagged_df.loc[imname]
         labels.append(labels_temp)
-    train_imgs = img_as_float(np.asarray(train_imgs))
-    return train_imgs, labels, im_names, tagged_df
+    X_train = pd.DataFrame(X_train)
+    labels = pd.DataFrame(labels)
+    return X_train, labels, im_names, tagged_df
 
     
 def get_labels(fname, tagged_df):
@@ -84,6 +97,7 @@ def plot_samples(X_train, names_train, tagged_df, nrow, ncol):
         axes[ind].tick_params(left=False, right=False)
         axes[ind].set_yticklabels([])
         axes[ind].set_xticklabels([])
+        axes[ind].axis('off')
     plt.tight_layout()
 
 
@@ -122,101 +136,58 @@ def xform_to_sobel(imgs):
             sobels.append(filters.sobel(imgs[i]))
     return np.asarray(sobels)
 
-def get_features(imgs):
+def get_features(img):
     """Input is a Nx256x256x3 numpy array of images, where N is number of images"""
         
-    r_mean = []
-    g_mean = []
-    b_mean = []
-
-    r_std = []
-    g_std = []
-    b_std = []
-
-    r_max = []
-    g_max = []
-    b_max = []
-
-    r_min = []
-    g_min = []
-    b_min = []
-
-    r_kurtosis = []
-    g_kurtosis = []
-    b_kurtosis = []
-    
-    r_skew = []
-    g_skew = []
-    b_skew = []
-    
-    sobel_mean = []
-    sobel_std = []
-    sobel_max = []
-    sobel_min = []
-    sobel_kurtosis = []
-    sobel_skew = []
-    
-    sobel_rowmean_std = []
-    sobel_colmean_std = []
-    
-    r_bimodal = []
-    g_bimodal = []
-    b_bimodal = []
-    
     # METRIC FOR BIMODALITY
     # bin each color intensity (histogram)
     # find 2 most populated bins
     # subtract and abs() to quantify bimodality
-
-    for i in range(imgs.shape[0]):
         
-        r = imgs[:,:,0].ravel()
-        g = imgs[:,:,1].ravel()
-        b = imgs[:,:,2].ravel()
-                
-        s = xform_to_sobel(imgs[i])
-        
-        r_mean.append(np.mean(r))
-        g_mean.append(np.mean(g))
-        b_mean.append(np.mean(b))
-        
-        r_std.append(np.std(r))
-        g_std.append(np.std(g))
-        b_std.append(np.std(b))
-        
-        r_max.append(np.max(r))
-        b_max.append(np.max(b))
-        g_max.append(np.max(g))
-        
-        r_min.append(np.min(r))
-        b_min.append(np.min(b))
-        g_min.append(np.min(g))
-        
-        r_kurtosis.append(scipy.stats.kurtosis(r))
-        b_kurtosis.append(scipy.stats.kurtosis(b))
-        g_kurtosis.append(scipy.stats.kurtosis(g))
-        
-        r_skew.append(scipy.stats.skew(r))
-        b_skew.append(scipy.stats.skew(b))
-        g_skew.append(scipy.stats.skew(g))
-        
-        sobel_mean.append(np.mean(s.ravel()))
-        sobel_std.append(np.std(s.ravel()))
-        sobel_max.append(np.max(s.ravel()))
-        sobel_min.append(np.min(s.ravel()))
-        sobel_kurtosis.append(scipy.stats.kurtosis(s.ravel()))
-        sobel_skew.append(scipy.stats.skew(s.ravel()))
-        
-        sobel_rowmean_std.append(np.std(np.mean(s,axis=1)))
-        sobel_colmean_std.append(np.std(np.mean(s,axis=0)))
-        
-        rb, gb, bb = binned_mode_features(imgs[i])
-        r_bimodal.append(rb)
-        g_bimodal.append(gb)
-        b_bimodal.append(bb)
-        
-                      
-    return pd.DataFrame(
+    r = img[:,:,0].ravel()
+    g = img[:,:,1].ravel()
+    b = img[:,:,2].ravel()
+            
+    s = xform_to_sobel(img)
+    
+    r_mean = np.mean(r)
+    g_mean = np.mean(g)
+    b_mean = np.mean(b)
+    
+    r_std = np.std(r)
+    g_std = np.std(g)
+    b_std = np.std(b)
+    
+    r_max = np.max(r)
+    b_max = np.max(b)
+    g_max = np.max(g)
+    
+    r_min = np.min(r)
+    b_min = np.min(b)
+    g_min = np.min(g)
+    
+    r_kurtosis = scipy.stats.kurtosis(r)
+    b_kurtosis = scipy.stats.kurtosis(b)
+    g_kurtosis = scipy.stats.kurtosis(g)
+    
+    r_skew = scipy.stats.skew(r)
+    b_skew = scipy.stats.skew(b)
+    g_skew = scipy.stats.skew(g)
+    
+    sobel_mean = np.mean(s.ravel())
+    sobel_std = np.std(s.ravel())
+    sobel_max = np.max(s.ravel())
+    sobel_min = np.min(s.ravel())
+    sobel_kurtosis = scipy.stats.kurtosis(s.ravel())
+    sobel_skew = scipy.stats.skew(s.ravel())
+    
+    sobel_rowmean_std = np.std(np.mean(s,axis=1))
+    sobel_colmean_std = np.std(np.mean(s,axis=0))
+    
+    r_bimodal, g_bimodal, b_bimodal = binned_mode_features(img)
+    
+                  
+    return pd.Series(
         {'r_mean':r_mean, 'g_mean':g_mean, 'b_mean':b_mean,
          'r_std':r_std, 'g_std':g_std, 'b_std':b_std,
          'r_max':r_max, 'g_max':g_max, 'b_max':b_max,
@@ -230,7 +201,7 @@ def get_features(imgs):
          'r_bimodal':r_bimodal, 'g_bimodal':g_bimodal, 'b_bimodal':b_bimodal})
 
 
-def binned_mode_features(img, nbins=10):
+def binned_mode_features(img, nbins=100):
                                           
     steps=np.arange(start=0,stop=1, step=1/nbins)
                                                                             

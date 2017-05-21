@@ -3,7 +3,7 @@
 
 # # Exploratory Data Analysis
 
-# In[89]:
+# In[1]:
 
 import pandas as pd
 import numpy as np
@@ -21,7 +21,9 @@ from importlib import reload
 import scipy
 
 
-# In[90]:
+# ### Import the custom KaggleAmazonMain module
+
+# In[2]:
 
 cwd = os.getcwd()
 path = os.path.join(cwd, '..', 'src')
@@ -29,33 +31,44 @@ if not path in sys.path:
     sys.path.append(path)
 del cwd, path
 
-
-# In[91]:
-
 import KaggleAmazonMain
 
 
-# In[98]:
+# In[3]:
 
 reload(KaggleAmazonMain)
 
 
-# In[5]:
+# # Load training image data
 
-X_train, y_train, names_train, tagged_df = KaggleAmazonMain.load_training_data()
+# In[4]:
 
+X_train, y_train, names_train, tagged_df = KaggleAmazonMain.load_training_data(sampleOnly=False)
+
+
+# In[13]:
+
+X_train.head()
+
+
+# In[15]:
+
+X_train.describe()
+
+
+# In[16]:
+
+y_train
+
+
+# In[17]:
+
+y_train.describe()
+
+
+# ### See distribution of label counts. Note a significant imbalance.
 
 # In[6]:
-
-X_train.shape
-
-
-# In[7]:
-
-tagged_df.head()
-
-
-# In[8]:
 
 #Barplot of tag counts
 get_ipython().magic('matplotlib inline')
@@ -67,56 +80,38 @@ plt.show()
 tagged_df.sum().sort_values(ascending=False)
 
 
-# # Load Image Data
+# ### Get a feel for the size and shape of the data
 
-# In[9]:
+# In[7]:
 
-len(y_train)
-
-
-# In[10]:
-
-# 100 files, images are 256x256 pixels, with a channel dimension size 3 = RGB
+# n files, images are 256x256 pixels, with a channel dimension size 3 = RGB
 print('X_train is a {} object'.format(type(X_train)))
 print('it has shape {}'.format(X_train.shape))
 
 
-# In[11]:
+# In[10]:
 
 print('y_train is a {} object'.format(type(y_train)))
 print('it has {} elements'.format(len(y_train)))
-print('each element is of type {}'.format(type(y_train[0])))
-print('and the elements are of size {}'.format(y_train[0].shape))
 
 
-# In[12]:
+# In[11]:
 
 print('names_train is a {} object'.format(type(names_train)))
 print('it has {} elements'.format(len(names_train)))
 print('each element is of type {}'.format(type(names_train)))
 
 
-# In[13]:
+# # Exploratory plotting
+
+# ## Plot some random images with their labels
+
+# In[118]:
 
 KaggleAmazonMain.plot_samples(X_train, names_train, tagged_df, 4,4)
 
 
-# # Feature Engineering
-# What type of features are we working with here?
-
-# In[14]:
-
-fig, axes = plt.subplots(1, 3, figsize=(15, 12))
-axes[0].imshow(X_train[0,:,:,0], cmap='gray')
-axes[1].imshow(X_train[0,:,:,1])
-axes[2].imshow(X_train[0,:,:,2])
-plt.axis('off')
-
-
-# In[15]:
-
-pics = ['train_10039', 'train_10059', 'train_10034']
-
+# ## Plot images with labels and their RGB intensity distributions
 
 # In[16]:
 
@@ -128,10 +123,7 @@ for i in range(0,3):
     KaggleAmazonMain.plot_rgb_dist(X_train[sample[0],:,:,:],tags)
 
 
-# In[17]:
-
-imshow(filters.sobel(rgb2gray(X_train[0,:,:,:])), cmap='gray')
-
+# ## Plot sobels of some images with labels
 
 # In[18]:
 
@@ -148,68 +140,33 @@ X_train_sobel = np.asarray(X_train_sobel)
 KaggleAmazonMain.plot_samples(X_train_sobel, names_train, tagged_df, 4,4)
 
 
-# In[20]:
-
-X_train_sobel = KaggleAmazonMain.xform_to_sobel(X_train)
-
-
-# In[73]:
-
-len(y_train)
-
-
-# In[78]:
-
-pd.DataFrame(y_train)
-
-
-# In[99]:
-
-features = KaggleAmazonMain.get_features(X_train)
-
-
-# In[64]:
-
-KaggleAmazonMain.
-
-
-# In[100]:
-
-features.head()
-
-
-# In[30]:
-
-features.describe()
-
+# # Develop predictive models
 
 # In[79]:
 
 from sklearn.ensemble import RandomForestClassifier
 
 
-# In[82]:
-
-len(features)
-
-
-# In[83]:
-
-y_train_df = pd.DataFrame(y_train)
-
-
-# In[85]:
-
-len(y_train_df)
-
-
-# In[ ]:
+# In[105]:
 
 rf = RandomForestClassifier(n_estimators = 10, 
                             max_features = 'sqrt',
                             bootstrap = True, 
                             oob_score = True,
-                            n_jobs = -1,
-                            
-                           )
+                            n_jobs = -1)
+
+
+# In[106]:
+
+rf.fit(features, y_train_df)
+
+
+# In[114]:
+
+rf.predict(features)[0,:]
+
+
+# In[115]:
+
+y_train[0]
 
