@@ -3,7 +3,7 @@
 
 # # Exploratory Data Analysis
 
-# In[27]:
+# In[89]:
 
 import pandas as pd
 import numpy as np
@@ -21,7 +21,7 @@ from importlib import reload
 import scipy
 
 
-# In[2]:
+# In[90]:
 
 cwd = os.getcwd()
 path = os.path.join(cwd, '..', 'src')
@@ -30,12 +30,12 @@ if not path in sys.path:
 del cwd, path
 
 
-# In[3]:
+# In[91]:
 
 import KaggleAmazonMain
 
 
-# In[66]:
+# In[98]:
 
 reload(KaggleAmazonMain)
 
@@ -163,17 +163,17 @@ len(y_train)
 pd.DataFrame(y_train)
 
 
-# In[63]:
+# In[99]:
 
 features = KaggleAmazonMain.get_features(X_train)
 
 
 # In[64]:
 
-X_train[0].shape
+KaggleAmazonMain.
 
 
-# In[65]:
+# In[100]:
 
 features.head()
 
@@ -205,5 +205,11 @@ len(y_train_df)
 
 # In[ ]:
 
-rf = RandomForestClassifier()
+rf = RandomForestClassifier(n_estimators = 10, 
+                            max_features = 'sqrt',
+                            bootstrap = True, 
+                            oob_score = True,
+                            n_jobs = -1,
+                            
+                           )
 
