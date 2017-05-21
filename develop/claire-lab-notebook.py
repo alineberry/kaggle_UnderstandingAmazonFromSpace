@@ -3,7 +3,7 @@
 
 # # Exploratory Data Analysis
 
-# In[2]:
+# In[3]:
 
 import pandas as pd
 import numpy as np
@@ -18,7 +18,7 @@ import glob
 import math
 
 
-# In[3]:
+# In[4]:
 
 cwd = os.getcwd()
 path = os.path.join(cwd, '..', 'src')
@@ -27,22 +27,25 @@ if not path in sys.path:
 del cwd, path
 
 
-# In[4]:
+# In[5]:
 
 import KaggleAmazonMain as kam
 
 
-# In[5]:
+# In[17]:
 
-X_train, y_train, names_train, tagged_df = kam.load_training_data()
+#Load from pickle unless something has changed
+X_train = pd.read_pickle('X_train.pkl')
+y_train = pd.read_pickle('y_train.pkl')
+#X_train, y_train, names_train, tagged_df = kam.load_training_data(sampleOnly=True) #this creates the pickle
 
 
-# In[6]:
+# In[8]:
 
 tagged_df.head()
 
 
-# In[7]:
+# In[9]:
 
 #Barplot of tag counts
 get_ipython().magic('matplotlib inline')
@@ -54,23 +57,7 @@ plt.show()
 tagged_df.sum().sort_values(ascending=False)
 
 
-# In[8]:
-
-# 100 files, images are 256x256 pixels, with a channel dimension size 3 = RGB
-print('X_train is a {} object'.format(type(X_train)))
-print('it has shape {}'.format(X_train.shape))
-
-print('y_train is a {} object'.format(type(y_train)))
-print('it has {} elements'.format(len(y_train)))
-print('each element is of type {}'.format(type(y_train[0])))
-print('and the elements are of size {}'.format(y_train[0].shape))
-
-print('names_train is a {} object'.format(type(names_train)))
-print('it has {} elements'.format(len(names_train)))
-print('each element is of type {}'.format(type(names_train)))
-
-
-# In[9]:
+# In[11]:
 
 kam.plot_samples(X_train, names_train, tagged_df, nrow=4, ncol=4)
 
@@ -98,17 +85,14 @@ for i in range(0,3):
     kam.plot_rgb_dist(X_train[sample[0],:,:,:],tags)
 
 
-# ## Feature Creation
 # Create features from the raw pixel data. These metrics should be metrics that describe patterns in the trends and distributions of the pixels. 
 # Using binned historgram features to capture bimodality and general shape and location of distributions in red, green, and blue.
 # 
 # I want to try an ML algorithm with feature cdreation, and a NN with raw pixel data to compare results. 
 # 
 # binned mode differences is a feature created to discribe bimodal distributions. A lot of the r g b distributions are bimodal, which could offer interesting insight into the  classificatioin, so I created a feature to capture bimodal patterns in the r g b pixel distributions. The binned mode differences is simply the differnce between the two min bounds of the two largest count bins, or the two modes. If this value is large, then the two larges modes are a large distance from eachother, indicating the distribution is bimodal.
-# Could also create an indicatorr feauture from this with bimodal or not. 
-# 
 
-# In[29]:
+# In[12]:
 
 #Binned mode differences
 
@@ -174,9 +158,48 @@ steps=np.arange(start=0,stop=1, step=.01)
 binned_mode_features_with_diagnostics(img, steps)
 
 
+# Also created sobel features. blah blah blah about those
+
 # In[28]:
 
+X_train_g = rgb2gray(X_train)
 
+X_train_sobel = []
+for i in range(X_train_g.shape[0]):
+    X_train_sobel.append(filters.sobel(X_train_g[i]))
+X_train_sobel = np.asarray(X_train_sobel)
+
+
+# In[ ]:
+
+KaggleAmazonMain.plot_samples(X_train_sobel, names_train, tagged_df, 4,4)
+
+
+# Check out the features that were made... See if they describe separation of  classes. 
+
+# In[124]:
+
+get_ipython().magic('matplotlib inline')
+plt.rcParams['figure.figsize'] = (10, 20)
+
+#create table of each feature histograms for each label
+X_train.set_index(y_train.index, inplace=True)
+print(X_train.columns) #possible features to plot
+
+colors = cm.rainbow(np.linspace(0, 1, len(y_train.columns))) #pick colors for plots by labels
+
+#function to plot distributions of a featur by class label
+def plot_a_feature_by_labels(feature):
+    for i in np.arange(0, len(y_train.columns)):
+        col=y_train.columns[i]
+        ind_list = y_train[y_train[col]==1].index.tolist()
+        X_train.ix[ind_list][feature].hist(bins=25, color=colors[i])
+        plt.title(col)
+        plt.grid(True)
+        plt.subplot(6,3,i+1) 
+        
+#plot_a_feature_by_labels('b_bimodal')        
+plot_a_feature_by_labels('b_skew')
 
 
 # In[ ]:
