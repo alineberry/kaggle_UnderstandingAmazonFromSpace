@@ -159,6 +159,10 @@ def get_features(imgs):
     sobel_rowmean_std = []
     sobel_colmean_std = []
     
+    r_bimodal = []
+    g_bimodal = []
+    b_bimodal = []
+    
     # METRIC FOR BIMODALITY
     # bin each color intensity (histogram)
     # find 2 most populated bins
@@ -170,7 +174,7 @@ def get_features(imgs):
         g = imgs[:,:,1].ravel()
         b = imgs[:,:,2].ravel()
                 
-        s = KaggleAmazonMain.xform_to_sobel(imgs[i])
+        s = xform_to_sobel(imgs[i])
         
         r_mean.append(np.mean(r))
         g_mean.append(np.mean(g))
@@ -206,6 +210,11 @@ def get_features(imgs):
         sobel_rowmean_std.append(np.std(np.mean(s,axis=1)))
         sobel_colmean_std.append(np.std(np.mean(s,axis=0)))
         
+        rb, gb, bb = binned_mode_features(imgs[i])
+        r_bimodal.append(rb)
+        g_bimodal.append(gb)
+        b_bimodal.append(bb)
+        
                       
     return pd.DataFrame(
         {'r_mean':r_mean, 'g_mean':g_mean, 'b_mean':b_mean,
@@ -217,9 +226,14 @@ def get_features(imgs):
          'sobel_mean':sobel_mean, 'sobel_std':sobel_std, 
          'sobel_max':sobel_max, 'sobel_min':sobel_min,
          'sobel_kurtosis':sobel_kurtosis, 'sobel_skew':sobel_skew,
-         'sobel_rowmean_std':sobel_rowmean_std, 'sobel_colmean_std':sobel_colmean_std})
+         'sobel_rowmean_std':sobel_rowmean_std, 'sobel_colmean_std':sobel_colmean_std,
+         'r_bimodal':r_bimodal, 'g_bimodal':g_bimodal, 'b_bimodal':b_bimodal})
 
-def binned_mode_features(img, steps):
+
+def binned_mode_features(img, nbins=10):
+                                          
+    steps=np.arange(start=0,stop=1, step=1/nbins)
+                                                                            
     ## red ##
     #split on mean
     m=img[:,:,0].flatten().mean()
@@ -253,7 +267,7 @@ def binned_mode_features(img, steps):
     mo2 = np.histogram(left, bins=steps, density=False)[1][max_ind_left]
     mods_diff_b=abs(mo1-mo2)
 
-    return mods_diff_r, mods_diff_g, mods_diff_b
+    return mods_diff_r[0], mods_diff_g[0], mods_diff_b[0]
                       
                       
                       
