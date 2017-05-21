@@ -32,17 +32,17 @@ del cwd, path
 import KaggleAmazonMain as kam
 
 
-# In[10]:
+# In[4]:
 
 X_train, y_train, names_train, tagged_df = kam.load_training_data()
 
 
-# In[11]:
+# In[5]:
 
 tagged_df.head()
 
 
-# In[12]:
+# In[6]:
 
 #Barplot of tag counts
 get_ipython().magic('matplotlib inline')
@@ -54,7 +54,7 @@ plt.show()
 tagged_df.sum().sort_values(ascending=False)
 
 
-# In[16]:
+# In[10]:
 
 # 100 files, images are 256x256 pixels, with a channel dimension size 3 = RGB
 print('X_train is a {} object'.format(type(X_train)))
@@ -70,7 +70,7 @@ print('it has {} elements'.format(len(names_train)))
 print('each element is of type {}'.format(type(names_train)))
 
 
-# In[20]:
+# In[11]:
 
 kam.plot_samples(X_train, names_train, tagged_df, nrow=4, ncol=4)
 
@@ -80,7 +80,7 @@ kam.plot_samples(X_train, names_train, tagged_df, nrow=4, ncol=4)
 # Feature engineering explores the feature data, and does feature creation.
 # Each image consists of pixel values in red, geen, and blue color schemes. The patterns in these pixels will  have useful trends for classifying the objects in the images and the image types. Notice how the statistical distributions of the red, green, and blue, pixels differ for different types of tags.
 
-# In[39]:
+# In[12]:
 
 fig, axes = plt.subplots(1, 3, figsize=(10, 6))
 axes[0].imshow(X_train[1,:,:,0], cmap='Reds')
@@ -88,7 +88,7 @@ axes[1].imshow(X_train[1,:,:,1], cmap='Greens')
 axes[2].imshow(X_train[1,:,:,2], cmap='Blues')
 
 
-# In[40]:
+# In[13]:
 
 plt.subplots_adjust(wspace=0, hspace=0)
 for i in range(0,3):
@@ -101,8 +101,115 @@ for i in range(0,3):
 # ## Feature Creation
 # Create features from the raw pixel data. These metrics should be metrics that describe patterns in the trends and distributions of the pixels. 
 # Using binned historgram features to capture bimodality and general shape and location of distributions in red, green, and blue.
+# 
+# I want to try an ML algorithm with feature cdreation, and a NN with raw pixel data to compare results. 
+# 
+# binned mode differences is a feature created to discribe bimodal distributions. A lot of the r g b distributions are bimodal, which could offer interesting insight into the  classificatioin, so I created a feature to capture bimodal patterns in the r g b pixel distributions. The binned mode differences is simply the differnce between the two min bounds of the two largest count bins, or the two modes. If this value is large, then the two larges modes are a large distance from eachother, indicating the distribution is bimodal.
+# Could also create an indicatorr feauture from this with bimodal or not. 
+# 
+
+# In[166]:
+
+#Binned mode differences
+
+def binned_mode_features_with_diagnostics(img, steps):
+    ## red ##
+    #split on mean
+    m=img[:,:,0].flatten().mean()
+    left = img[:,:,0].flatten()[img[:,:,0].flatten()<m]
+    right = img[:,:,0].flatten()[img[:,:,0].flatten()>=m]
+    #find mode in left and right
+    max_ind_left = np.histogram(left, bins=steps, density=False)[0].argsort()[-1:]
+    max_ind_right = np.histogram(right, bins=steps, density=False)[0].argsort()[-1:]
+    #calc bimodal metric
+    mo1 = np.histogram(right, bins=steps, density=False)[1][max_ind_right]
+    mo2 = np.histogram(left, bins=steps, density=False)[1][max_ind_left]
+    mods_diff_r=abs(mo1-mo2)
+    print("The mean of the red distribution is {}".format(m.round(2)))
+    print("After splitting on the mean, the two modes are found at {} and {}".format(mo2, mo1))
+    plt.hist(img[:,:,0].flatten(), color='red', bins=steps)
+    plt.axvline(img[:,:,0].mean(), color='black', linestyle='dashed', linewidth=2)
+    plt.axvline(mo1, color='yellow', linestyle='dashed', linewidth=2)
+    plt.axvline(mo2, color='yellow', linestyle='dashed', linewidth=2)
+    plt.show()
+    
+    ## green ##
+    m=img[:,:,1].flatten().mean()
+    left = img[:,:,1].flatten()[img[:,:,1].flatten()<m]
+    right = img[:,:,1].flatten()[img[:,:,1].flatten()>=m]
+    max_ind_left = np.histogram(left, bins=steps, density=False)[0].argsort()[-1:]
+    max_ind_right = np.histogram(right, bins=steps, density=False)[0].argsort()[-1:]
+    mo1 = np.histogram(right, bins=steps, density=False)[1][max_ind_right]
+    mo2 = np.histogram(left, bins=steps, density=False)[1][max_ind_left]
+    mods_diff_g=abs(mo1-mo2)
+    print("The mean of the green distribution is {}".format(m.round(2)))
+    print("After splitting on the mean, the two modes are found at {} and {}".format(mo2, mo1))
+    plt.hist(img[:,:,1].flatten(), color='green', bins=steps)
+    plt.axvline(img[:,:,1].mean(), color='black', linestyle='dashed', linewidth=2)
+    plt.axvline(mo1, color='yellow', linestyle='dashed', linewidth=2)
+    plt.axvline(mo2, color='yellow', linestyle='dashed', linewidth=2)
+    plt.show()
+    
+    ## blue ##
+    m=img[:,:,2].flatten().mean()
+    left = img[:,:,2].flatten()[img[:,:,2].flatten()<m]
+    right = img[:,:,2].flatten()[img[:,:,2].flatten()>=m]
+    max_ind_left = np.histogram(left, bins=steps, density=False)[0].argsort()[-1:]
+    max_ind_right = np.histogram(right, bins=steps, density=False)[0].argsort()[-1:]
+    mo1 = np.histogram(right, bins=steps, density=False)[1][max_ind_right]
+    mo2 = np.histogram(left, bins=steps, density=False)[1][max_ind_left]
+    mods_diff_b=abs(mo1-mo2)
+    print("The mean of the blue distribution is {}".format(m.round(2)))
+    print("After splitting on the mean, the two modes are found at {} and {}".format(mo2, mo1))
+    plt.hist(img[:,:,2].flatten(), color='blue', bins=steps)
+    plt.axvline(img[:,:,2].mean(), color='black', linestyle='dashed', linewidth=2)
+    plt.axvline(mo1, color='yellow', linestyle='dashed', linewidth=2)
+    plt.axvline(mo2, color='yellow', linestyle='dashed', linewidth=2)
+    plt.show()
+    
+    return mods_diff_r, mods_diff_g, mods_diff_b
+
+img=X_train[2]
+steps=np.arange(start=0,stop=1, step=.01)
+binned_mode_features(img, steps)
+    
+
 
 # In[ ]:
 
+def binned_mode_features(img, steps):
+    ## red ##
+    #split on mean
+    m=img[:,:,0].flatten().mean()
+    left = img[:,:,0].flatten()[img[:,:,0].flatten()<m]
+    right = img[:,:,0].flatten()[img[:,:,0].flatten()>=m]
+    #find mode in left and right
+    max_ind_left = np.histogram(left, bins=steps, density=False)[0].argsort()[-1:]
+    max_ind_right = np.histogram(right, bins=steps, density=False)[0].argsort()[-1:]
+    #calc bimodal metric
+    mo1 = np.histogram(right, bins=steps, density=False)[1][max_ind_right]
+    mo2 = np.histogram(left, bins=steps, density=False)[1][max_ind_left]
+    mods_diff_r=abs(mo1-mo2)
 
+    ## green ##
+    m=img[:,:,1].flatten().mean()
+    left = img[:,:,1].flatten()[img[:,:,1].flatten()<m]
+    right = img[:,:,1].flatten()[img[:,:,1].flatten()>=m]
+    max_ind_left = np.histogram(left, bins=steps, density=False)[0].argsort()[-1:]
+    max_ind_right = np.histogram(right, bins=steps, density=False)[0].argsort()[-1:]
+    mo1 = np.histogram(right, bins=steps, density=False)[1][max_ind_right]
+    mo2 = np.histogram(left, bins=steps, density=False)[1][max_ind_left]
+    mods_diff_g=abs(mo1-mo2)
+
+    ## blue ##
+    m=img[:,:,2].flatten().mean()
+    left = img[:,:,2].flatten()[img[:,:,2].flatten()<m]
+    right = img[:,:,2].flatten()[img[:,:,2].flatten()>=m]
+    max_ind_left = np.histogram(left, bins=steps, density=False)[0].argsort()[-1:]
+    max_ind_right = np.histogram(right, bins=steps, density=False)[0].argsort()[-1:]
+    mo1 = np.histogram(right, bins=steps, density=False)[1][max_ind_right]
+    mo2 = np.histogram(left, bins=steps, density=False)[1][max_ind_left]
+    mods_diff_b=abs(mo1-mo2)
+
+    return mods_diff_r, mods_diff_g, mods_diff_b
 
