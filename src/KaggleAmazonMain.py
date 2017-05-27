@@ -12,11 +12,52 @@ import math
 import scipy
 
 
+def load_sample_training_data(ftype='jpg'):
+    """Returns (train_imgs, labels, im_names, tagged_df)
+    train_imgs is the raw image data in the sample folder
+    """
+    cwd = os.getcwd()
+    print("cwd",cwd)
+
+    #open data from current directory. Should work with any direcotry path
+    with open(os.path.join(cwd, "..", "data", "train.csv")) as file:
+        tagged_df = pd.read_csv(file)
+
+    #split the tags into new rows
+    tagged_df = pd.DataFrame(tagged_df.tags.str.split(' ').tolist(), index=tagged_df.image_name).stack()
+    tagged_df = tagged_df.reset_index()[[0, 'image_name']] # dataframe with two columns
+    tagged_df.columns = ['tags', 'image_name'] # rename columns
+    tagged_df.set_index('image_name', inplace=True) # rest index to image_name again
+
+    #create dummy variables for each tag
+    tagged_df = pd.get_dummies(tagged_df['tags']) # creates dummy rows
+    tagged_df = tagged_df.groupby(tagged_df.index).sum() # adds dummy rows together by image_name index
+
+    train_imgs = []
+    labels = []
+    im_names = []
+    print('Loading {} image dataset'.format(ftype))
+    path = os.path.join(cwd, '..', 'data','train-{}-sample'.format(ftype),'*.'+ftype)
+    files = glob.glob(path)
+    for fs in files:
+        img = imread(fs)
+        # img = transform.resize(img, output_shape=(h,w,d), preserve_range=True)  if needed
+        train_imgs.append(img)
+        
+        imname = os.path.basename(fs).split('.')[0]
+        im_names.append(imname)
+        
+        labels_temp = tagged_df.loc[imname]
+        labels.append(labels_temp)
+    train_imgs = img_as_float(np.asarray(train_imgs))
+    return train_imgs, labels, im_names, tagged_df
+
+
 def load_training_data(sampleOnly=True, ftype='jpg'):
     """
-    Returns (train_imgs, labels, im_names, tagged_df). Set sampleOnly to False in order to load the full training set.
+    Returns (X_train, labels, im_names, tagged_df). Set sampleOnly to False in order to load the full training set.
     
-    - train_imgs is a numpy array size (N x 256 x 256 x 3)
+    - X_train is the feature matrix, NOT the raw image data
     - labels is a pandas dataframe, containing label dummy vectors for each image in train_images
       labels could be smaller than tagged_df if only a sample of images is loaded
     - im_names is a list of strings containing the filenames with extension removed
@@ -39,6 +80,7 @@ def load_training_data(sampleOnly=True, ftype='jpg'):
     #create dummy variables for each tag
     tagged_df = pd.get_dummies(tagged_df['tags']) # creates dummy rows
     tagged_df = tagged_df.groupby(tagged_df.index).sum() # adds dummy rows together by image_name index
+    tagged_df[tagged_df > 1] = 1  # some image labels are doubled up
 
     X_train = []
     labels = []
