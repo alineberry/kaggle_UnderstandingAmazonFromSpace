@@ -281,6 +281,17 @@ def binned_mode_features(img, nbins=100):
     mods_diff_b=abs(mo1-mo2)
 
     return mods_diff_r[0], mods_diff_g[0], mods_diff_b[0]
+
+#function to plot distributions of a featur by class label
+def plot_a_feature_by_labels(feature):
+    colors = cm.rainbow(np.linspace(0, 1, len(y_train.columns))) #pick colors for plots by labels
+    for i in np.arange(0, len(y_train.columns)):
+        col=y_train.columns[i]
+        ind_list = y_train[y_train[col]==1].index.tolist()
+        X_train.ix[ind_list][feature].hist(bins=25, color=colors[i])
+        plt.title(col)
+        plt.grid(True)
+        plt.subplot(6,3,i+1) 
                       
                       
                       
