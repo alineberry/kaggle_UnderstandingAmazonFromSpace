@@ -7,6 +7,8 @@ import seaborn as sns
 from skimage.io import imread, imshow
 from skimage import transform, img_as_float, filters
 from skimage.color import rgb2gray
+from skimage.feature import blob_dog, blob_log, blob_doh, canny
+from skimage.transform import hough_line
 import glob
 import math
 import scipy
@@ -55,11 +57,11 @@ def load_sample_training_data(ftype='jpg'):
 
 def load_training_data(sampleOnly=True, ftype='jpg'):
     """
-    Returns (X_train, labels, im_names, tagged_df). Set sampleOnly to False in order to load the full training set.
+    Returns (X, y, im_names, tagged_df). Set sampleOnly to False in order to load the full training set.
     
-    - X_train is the feature matrix, NOT the raw image data
-    - labels is a pandas dataframe, containing label dummy vectors for each image in train_images
-      labels could be smaller than tagged_df if only a sample of images is loaded
+    - X is the feature matrix, NOT the raw image data
+    - y is a pandas dataframe, containing label dummy vectors for each image in train_images
+      y could be smaller than tagged_df if only a sample of images is loaded
     - im_names is a list of strings containing the filenames with extension removed
     - tagged_df is a dictionary of all image names and their tags. it is returned as a pandas dataframe
     """
@@ -82,8 +84,8 @@ def load_training_data(sampleOnly=True, ftype='jpg'):
     tagged_df = tagged_df.groupby(tagged_df.index).sum() # adds dummy rows together by image_name index
     tagged_df[tagged_df > 1] = 1  # some image labels are doubled up
 
-    X_train = []
-    labels = []
+    X = []
+    y = []
     im_names = []
     
     if sampleOnly:
@@ -103,16 +105,16 @@ def load_training_data(sampleOnly=True, ftype='jpg'):
         # img = transform.resize(img, output_shape=(h,w,d), preserve_range=True)  if needed
         #X_train.append(img)
         
-        X_train.append(get_features(img))
+        X.append(get_features(img))
         
         imname = os.path.basename(fs).split('.')[0]
         im_names.append(imname)
         
         labels_temp = tagged_df.loc[imname]
-        labels.append(labels_temp)
-    X_train = pd.DataFrame(X_train)
-    labels = pd.DataFrame(labels)
-    return X_train, labels, im_names, tagged_df
+        y.append(labels_temp)
+    X = pd.DataFrame(X)
+    y = pd.DataFrame(y)
+    return X, y, im_names, tagged_df
 
     
 def get_labels(fname, tagged_df):
@@ -164,6 +166,24 @@ def plot_rgb_dist(img, title):
     ax.imshow(img)
     plt.suptitle(title, fontsize=20)
     plt.axis('off')
+    
+def get_prediction_matrix(probs, threshold):
+    """
+    Input is a matrix of probabilities from sklearn, and a classification threshold
+    Output is a binary matrix of predictions
+    """
+    
+    # need to work with an n x #outcomes matrix where elements are probabilities of class 1
+    if type(probs) is list:
+        probs = restructure_probs_matrix(probs)
+    
+    return (probs > threshold).astype(int)
+
+def restructure_probs_matrix(probs):
+    probs_r = probs[0][:,1]
+    for arr in probs[1:]:
+        probs_r = np.column_stack((probs_r,arr[:,1]))
+    return probs_r
 
 def xform_to_gray(imgs):
     return rgb2gray(imgs)
@@ -178,6 +198,20 @@ def xform_to_sobel(imgs):
             sobels.append(filters.sobel(imgs[i]))
     return np.asarray(sobels)
 
+def xform_to_canny(imgs, sigma):
+    imgs = xform_to_gray(imgs)
+    cannys = []
+    if imgs.ndim == 2:
+        cannys.append(canny(imgs, sigma))
+    else:
+        for i in range(imgs.shape[0]):
+            cannys.append(canny(imgs[i], sigma))
+    return np.asarray(cannys)
+
+def get_num_blobs(img):
+    return len(blob_log(rgb2gray(img)))
+    
+
 def get_features(img):
     """Input is a Nx256x256x3 numpy array of images, where N is number of images"""
         
@@ -189,8 +223,12 @@ def get_features(img):
     r = img[:,:,0].ravel()
     g = img[:,:,1].ravel()
     b = img[:,:,2].ravel()
-            
+                
     s = xform_to_sobel(img)
+    
+    can = xform_to_canny(img, 0.5)
+    
+    hough, _, _ = hough_line(rgb2gray(img))
     
     r_mean = np.mean(r)
     g_mean = np.mean(g)
@@ -222,12 +260,28 @@ def get_features(img):
     sobel_min = np.min(s.ravel())
     sobel_kurtosis = scipy.stats.kurtosis(s.ravel())
     sobel_skew = scipy.stats.skew(s.ravel())
-    
     sobel_rowmean_std = np.std(np.mean(s,axis=1))
     sobel_colmean_std = np.std(np.mean(s,axis=0))
     
+    canny_mean = np.mean(can.ravel())
+    canny_std = np.std(can.ravel())
+    canny_max = np.max(can.ravel())
+    canny_min = np.min(can.ravel())
+    canny_kurtosis = scipy.stats.kurtosis(can.ravel())
+    canny_skew = scipy.stats.skew(can.ravel())
+    canny_rowmean_std = np.std(np.mean(can,axis=1))
+    canny_colmean_std = np.std(np.mean(can,axis=0))
+    
     r_bimodal, g_bimodal, b_bimodal = binned_mode_features(img)
     
+    n_blobs = get_num_blobs(img)
+    
+    hough_mean = np.mean(hough)
+    hough_std = np.std(hough)
+    hough_max = np.max(hough)
+    hough_min = np.max(hough)
+    hough_kurtosis = scipy.stats.kurtosis(hough.ravel())
+    hough_skew = scipy.stats.skew(hough.ravel())
                   
     return pd.Series(
         {'r_mean':r_mean, 'g_mean':g_mean, 'b_mean':b_mean,
@@ -240,7 +294,15 @@ def get_features(img):
          'sobel_max':sobel_max, 'sobel_min':sobel_min,
          'sobel_kurtosis':sobel_kurtosis, 'sobel_skew':sobel_skew,
          'sobel_rowmean_std':sobel_rowmean_std, 'sobel_colmean_std':sobel_colmean_std,
-         'r_bimodal':r_bimodal, 'g_bimodal':g_bimodal, 'b_bimodal':b_bimodal})
+         'canny_mean':canny_mean, 'canny_std':canny_std, 
+         'canny_max':canny_max, 'canny_min':canny_min,
+         'canny_kurtosis':canny_kurtosis, 'canny_skew':canny_skew,
+         'canny_rowmean_std':canny_rowmean_std, 'canny_colmean_std':canny_colmean_std,
+         'r_bimodal':r_bimodal, 'g_bimodal':g_bimodal, 'b_bimodal':b_bimodal,
+         'n_blobs':n_blobs,
+         'hough_mean':hough_mean, 'hough_std':hough_std, 'hough_max':hough_max,
+         'hough_min':hough_min, 'hough_kurtosis':hough_kurtosis, 'hough_skew':hough_skew
+        })
 
 
 def binned_mode_features(img, nbins=100):
@@ -281,17 +343,6 @@ def binned_mode_features(img, nbins=100):
     mods_diff_b=abs(mo1-mo2)
 
     return mods_diff_r[0], mods_diff_g[0], mods_diff_b[0]
-
-#function to plot distributions of a featur by class label
-def plot_a_feature_by_labels(feature):
-    colors = cm.rainbow(np.linspace(0, 1, len(y_train.columns))) #pick colors for plots by labels
-    for i in np.arange(0, len(y_train.columns)):
-        col=y_train.columns[i]
-        ind_list = y_train[y_train[col]==1].index.tolist()
-        X_train.ix[ind_list][feature].hist(bins=25, color=colors[i])
-        plt.title(col)
-        plt.grid(True)
-        plt.subplot(6,3,i+1) 
                       
                       
                       

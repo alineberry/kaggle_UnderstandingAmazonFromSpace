@@ -34,7 +34,7 @@ del cwd, path
 import KaggleAmazonMain
 
 
-# In[7]:
+# In[201]:
 
 reload(KaggleAmazonMain)
 
@@ -43,34 +43,43 @@ reload(KaggleAmazonMain)
 
 # Load from pickle unless something has changed:
 
-# In[76]:
-
-X = pd.read_pickle('X_train.pkl')
-y = pd.read_pickle('y_train.pkl')
+# In[ ]:
 
 
-# In[5]:
-
-type(y_train)
 
 
-# In[6]:
+# In[196]:
 
-y_train.describe()
+X = pd.read_pickle('X.pkl')
+y = pd.read_pickle('y.pkl')
+
+
+# In[195]:
+
+im_names = pickle.load('im_names.pkl', 'rb')
+tagged_df = pd.read_pickle('tagged_df.pkl')
 
 
 # Below cell will recreate the feature matrix. Use with caution as this may take around 30 minutes to complete.
 
-# In[4]:
+# In[203]:
 
-# X, y, names_train, tagged_df = KaggleAmazonMain.load_training_data(sampleOnly=False)
-# X.to_pickle('X.pkl')
-# y.to_pickle('y.pkl')
+reload(KaggleAmazonMain)
+X, y, im_names, tagged_df = KaggleAmazonMain.load_training_data(sampleOnly=False)
+X.to_pickle('X.pkl')
+y.to_pickle('y.pkl')
 
 
-# In[8]:
+# In[ ]:
 
-X_train.head()
+import pickle
+pickle.dump(im_names, open('im_names.pkl', "wb"))
+tagged_df.to_pickle('tagged_df.pkl')
+
+
+# In[198]:
+
+X.columns
 
 
 # In[9]:
@@ -162,6 +171,64 @@ X_train_sobel = np.asarray(X_train_sobel)
 KaggleAmazonMain.plot_samples(X_train_sobel, names_train, tagged_df, 4,4)
 
 
+# # Canny 
+
+# In[152]:
+
+sample_imgs, sample_imgs_labels, sample_imgs_names, tagged_df = KaggleAmazonMain.load_sample_training_data()
+
+
+# In[155]:
+
+sample_imgs_canny = KaggleAmazonMain.xform_to_canny(sample_imgs, sigma=.5)
+
+KaggleAmazonMain.plot_samples(sample_imgs_canny, sample_imgs_names, tagged_df, 4,4)
+
+
+# # Blob
+
+# In[157]:
+
+from skimage.feature import blob_dog, blob_log, blob_doh
+from skimage.color import rgb2gray
+
+
+# In[169]:
+
+type(sample_imgs)
+
+
+# In[171]:
+
+len(blob_log(rgb2gray(sample_imgs[4])))
+
+
+# # Hough line
+
+# In[181]:
+
+from skimage.transform import (hough_line, probabilistic_hough_line, hough_line_peaks)
+
+
+# In[189]:
+
+a,b,c = hough_line(rgb2gray(sample_imgs[5]))
+
+e,f,g = hough_line_peaks(a,b,c)
+
+print(len(e),len(f),len(g))
+
+
+# In[191]:
+
+a.sum()
+
+
+# In[167]:
+
+plt.imshow(sample_imgs[4])
+
+
 # # Develop predictive models
 
 # In[22]:
@@ -193,7 +260,7 @@ y_validation[y_validation > 1] = 1
 
 # In[38]:
 
-f2_score = make_scorer(fbeta_score, beta=2, average='samples')
+f2_scorer_obj = make_scorer(fbeta_score, beta=2, average='samples')
 
 rf = RandomForestClassifier(bootstrap = True, 
                             oob_score = False,
@@ -280,7 +347,7 @@ predict_probas_best[0].shape
 
 def get_prediction_matrix(probs, threshold):
     """
-    Input is a matrix of probabilities, and a classification threshold
+    Input is a matrix of probabilities from sklearn, and a classification threshold
     Output is a binary matrix of predictions
     """
     
@@ -311,7 +378,7 @@ def restructure_probs_matrix(probs):
     return probs_r
 
 
-# In[ ]:
+# In[139]:
 
 best_score = 0
 best_thresh = 0
@@ -341,11 +408,13 @@ for t in thresh:  # loop through possible threshold values
 print('\nbest score is: {} at a threshold of {}'.format(best_score, best_thresh))
 
 
-# In[ ]:
+# In[147]:
 
 import matplotlib.pyplot as plt
 get_ipython().magic('matplotlib inline')
+plt.figure(figsize=(10,6))
 plt.plot(thresh, scores)
+plt.title('F2 Score by Classification Threshold'); plt.xlabel('Threshold'); plt.ylabel('F2 Score')
 
 
 # In[103]:
@@ -439,31 +508,70 @@ len(predict_probas_best[0]), len(predict_probas_best)
 predictions_best.shape
 
 
-# ## Fit a new random forest
+# ## Fit, predict, and score using the final random forest
 
-# In[78]:
+# In[204]:
 
-X_train, X_validation, y_train, y_validation = train_test_split(X_train, y_train, test_size=0.40, random_state=14113)
+from sklearn.model_selection import cross_val_score
+from sklearn.metrics import fbeta_score
 
 
-# In[32]:
+# In[257]:
+
+X_noSobel = X.drop(list(filter(lambda x: 'sobel' in x, list(X.columns))), axis=1)
+X_noCanny = X.drop(list(filter(lambda x: 'canny' in x, list(X.columns))), axis=1)
+
+
+# In[224]:
+
+X.drop(['hough_skew','hough_kurtosis'], axis=1, inplace=True)
+
+
+# In[220]:
+
+pd.set_option('display.max_rows', 500)
+pd.set_option('display.max_columns', 500)
+
+
+# In[258]:
+
+X_train, X_validation, y_train, y_validation = train_test_split(X_noCanny, y, test_size=0.3, random_state=14113)
+
+
+# In[264]:
+
+rf = RandomForestClassifier(bootstrap=True, class_weight='balanced',
+            criterion='gini', max_depth=None, max_features=None,
+            max_leaf_nodes=None, min_impurity_split=1e-07,
+            min_samples_leaf=1, min_samples_split=2,
+            min_weight_fraction_leaf=0.0, n_estimators=300, n_jobs=-1,
+            oob_score=False, random_state=14113, verbose=0,
+            warm_start=False)
+
+
+# In[265]:
 
 rf.fit(X_train, y_train)
 
 
-# In[80]:
+# In[266]:
 
-predictions = rf.predict(X_validation)
-
-
-# In[81]:
-
-from sklearn.metrics import fbeta_score
+reload(KaggleAmazonMain)
 
 
-# In[51]:
+# In[267]:
 
-np.asarray(y_validation)
+probs = rf.predict_proba(X_validation)
+predictions = KaggleAmazonMain.get_prediction_matrix(probs, 0.25)
+
+score = fbeta_score(np.asarray(y_validation), predictions, beta=2, average='samples')
+
+print('F2 score: ', score)
+
+
+# In[ ]:
+
+
 
 
 # In[ ]:
@@ -474,6 +582,11 @@ np.asarray(y_validation)
 # In[ ]:
 
 
+
+
+# In[234]:
+
+fbeta_score(np.asarray(y_validation), rf.predict(X_validation), beta=2, average='samples')
 
 
 # In[ ]:

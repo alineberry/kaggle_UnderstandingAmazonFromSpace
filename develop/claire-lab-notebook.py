@@ -3,7 +3,7 @@
 
 # # Exploratory Data Analysis
 
-# In[113]:
+# In[1]:
 
 import pandas as pd
 import numpy as np
@@ -16,41 +16,44 @@ from skimage.io import imread, imshow
 from skimage import transform, img_as_float
 import glob
 import math
+from importlib import reload
 
 
-# In[114]:
+# In[2]:
 
 cwd = os.getcwd()
 path = os.path.join(cwd, '..', 'src')
 if not path in sys.path:
     sys.path.append(path)
 #del cwd, path
-
-
-# In[115]:
-
 import KaggleAmazonMain as kam
 
 
-# In[116]:
+# In[3]:
+
+reload(kam)
+
+
+# In[4]:
 
 #Load from pickle unless something has changed
-X_train = pd.read_pickle('X_train.pkl')
-y_train = pd.read_pickle('y_train.pkl')
-#X_train, y_train, names_train, tagged_df = kam.load_training_data(sampleOnly=True) #this creates the pickle
+X = pd.read_pickle('X_train.pkl')
+y = pd.read_pickle('y_train.pkl')
+y[y > 1] = 1 #fix labels accidently labels twice. mistake in tagging. oops. 
+#X_train, y_train, names_train, tagged_df = kam.load_sample_training_data()
 
 
-# In[117]:
+# In[6]:
 
-X_train.head()
+X.head()
 
 
-# In[5]:
+# In[7]:
 
 tagged_df.head()
 
 
-# In[9]:
+# In[8]:
 
 #Barplot of tag counts
 get_ipython().magic('matplotlib inline')
@@ -175,72 +178,73 @@ for i in range(X_train_g.shape[0]):
 X_train_sobel = np.asarray(X_train_sobel)
 
 
-# In[11]:
+# In[157]:
 
 KaggleAmazonMain.plot_samples(X_train_sobel, names_train, tagged_df, 4,4)
 
 
 # Check out the features that were made... See if they describe separation of  classes. 
 
-# In[12]:
+# In[5]:
 
 get_ipython().magic('matplotlib inline')
 plt.rcParams['figure.figsize'] = (10, 20)
 
 #create table of each feature histograms for each label
-X_train.set_index(y_train.index, inplace=True)
-print(X_train.columns) #possible features to plot
+X.set_index(y.index, inplace=True)
+print(X.columns) #possible features to plot
 
 
 #function to plot distributions of a featur by class label
 def plot_a_feature_by_labels(feature):
-    colors = cm.rainbow(np.linspace(0, 1, len(y_train.columns))) #pick colors for plots by labels
-    for i in np.arange(0, len(y_train.columns)):
-        col=y_train.columns[i]
-        ind_list = y_train[y_train[col]==1].index.tolist()
-        X_train.ix[ind_list][feature].hist(bins=25, color=colors[i])
+    colors = cm.rainbow(np.linspace(0, 1, len(y.columns))) #pick colors for plots by labels
+    for i in np.arange(0, len(y.columns)-1):
+        col=y.columns[i]
+        ind_list = y[y[col]==1].index.tolist()
+        X.ix[ind_list][feature].hist(bins=25, color=colors[i])
         plt.title(col)
         plt.grid(True)
         plt.subplot(6,3,i+1) 
+        #plt.xlim(0,X_train[feature].max())
+        #plt.axvline(X_train[feature].mean(), color='black', linestyle='dashed', linewidth=2) #fix this to plot mean 
+    
         
 #plot_a_feature_by_labels('b_bimodal')        
-plot_a_feature_by_labels('b_skew')
+plot_a_feature_by_labels('sobel_colmean_std')
 
 
-# # Develop predictive models
+# # Random Forest
 
-# In[77]:
+# In[16]:
 
-y_train[y_train > 1] = 1
-X_train, X_validation, y_train, y_validation = train_test_split(X_train, y_train, test_size=0.40, random_state=14113)
-
-
-# In[78]:
-
-y_train.sum() #these are the sample sizes per class
-y_validation.sum()
+from sklearn.model_selection import train_test_split
+X_train, X_validation, y_train, y_validation = train_test_split(X, y, test_size=0.40, random_state=14113)
 
 
-# In[79]:
+# In[17]:
+
+y.sum() #these are the sample sizes per class
+
+
+# In[180]:
 
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
 
-rf = RandomForestClassifier(n_estimators = 500, 
+rf = RandomForestClassifier(n_estimators = 100, 
                             max_features = 'sqrt',
                             bootstrap = True, 
                             oob_score = True,
                             n_jobs = -1,
                             random_state = 14113,
-                            class_weight = 'balanced')
+                            class_weight = 'balanced_subsample')
 
 
-# In[80]:
+# In[181]:
 
 rf.fit(X_train, y_train)
 
 
-# In[81]:
+# In[182]:
 
 #features ranking of features. 
 print('The oob error for this random forest is {}'.format(rf.oob_score_.round(2)))
@@ -253,7 +257,7 @@ Feature_importance
 
 # ## F2-score and other metrics
 
-# In[86]:
+# In[183]:
 
 from sklearn.metrics import fbeta_score
 np.asarray(y_validation)
@@ -262,13 +266,13 @@ predictions = rf.predict(X_validation)
 fbeta_score(np.asarray(y_validation), predictions, beta=2, average='samples')
 
 
-# precision is ... 
-# recall is ...
-# f score is ...
+# precision is  of the imgaes taggd with a particular class, how many times that was the right class. 
+# recall is of the images of a certain class, how many we correctly identified as that class. 
+# f score is a blah average of precision and recall. 
 # support is the same size of images with that label in the training data. 
 # blah blah blah add descriptions of these metrics 
 
-# In[87]:
+# In[184]:
 
 #calc some other scoring metrics. precision, recall, and f1.
 #The confusion matrix is diddicult to make and read for miltilabel classificatoin, but this table shows the same information 
@@ -276,7 +280,149 @@ fbeta_score(np.asarray(y_validation), predictions, beta=2, average='samples')
 from sklearn.metrics import precision_recall_fscore_support as score
 
 precision, recall, fscore, support = score(y_validation, predictions)
-Metrics = pd.DataFrame([precision, recall, fscore, support], index=['precision', 'recall', 'fscore', 'support'])
+Metrics = pd.DataFrame([precision, recall, support], index=['precision', 'recall', 'support'])
+Metrics.columns = y_validation.columns
+Metrics
+
+
+# ## Diagnostics
+
+# In[214]:
+
+probs = rf.predict_proba(X_validation)
+
+
+# In[219]:
+
+probs_df=pd.DataFrame(probs[0])
+probs_df.head()
+
+
+# In[242]:
+
+probs
+
+
+# In[244]:
+
+fpr, tpr, threshs = metrics.roc_curve(y_validation['agriculture'], probs[0][:,1], pos_label=None, sample_weight=None, drop_intermediate=False)
+
+
+# In[247]:
+
+fpr.shape
+
+
+# ROC curves visualize performance of a class/binary classifier. Visualization of how predicted probabilities compare to the truth. 
+
+# In[250]:
+
+plt.rcParams['figure.figsize'] = (6,6)
+
+plt.figure()
+lw = 2
+plt.plot(fpr, tpr, color='darkorange',
+         lw=lw)
+plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver operating characteristic example')
+plt.legend(loc="lower right")
+plt.show()
+
+
+# In[284]:
+
+#for the first class, this is the binary classification histograms. 
+#the treshold is the line that decides where a image belongs, to 0  or 1.
+#histograms are of the probabilities. 
+pd.DataFrame(probs[0]).plot.hist(subplots=False, bins=50, )
+
+
+# In[ ]:
+
+
+
+
+# In[ ]:
+
+#Path forward
+#Need to do upsampling and downsampling to handel these class impalance. 
+#set threshold
+#create more features. 
+
+
+# The imbalanced-learn library imblearn has great modules for oversampling. WE are usign oeversampling because undersampling leads to loss of information, and some classes are very small so it would also lead to a very small dataset. Note oversampling can lead to overfitting the samller classes... Didn't work with multiclasses. I wrote my oen function for oversampling. It oversamples classes smaller than l up to size l by repeating a relabeled image the same as the randomly sampled image. 
+
+# In[6]:
+
+from sklearn.model_selection import train_test_split
+X_train, X_validation, y_train, y_validation = train_test_split(X, y, test_size=0.40, random_state=14113)
+
+
+# In[32]:
+
+#randomly over sample
+
+def over_sample(X, y, l):
+    '''
+    resamples classes smaller than l to be size l
+    '''
+    y_sampled=y.copy()
+    X_sampled=X.copy()
+    cols=y.sum()[y.sum()<l].index #classes with less than l samples.
+    for c in cols:
+        I_y = y[y[c]==1].sample(n=l-len(y[c]), replace=True)
+        x_index = I_y.index #index of image names
+        I_y.reset_index(drop=True, inplace=True) #rename y index
+        y_sampled = y_sampled.append(I_y, )
+        
+        I_x = X.loc[x_index]
+        I_x.reset_index(drop=True, inplace=True) #rename y index
+        X_sampled = X_sampled.append(I_x, )
+
+    return X_sampled, y_sampled
+
+X_sampled, y_sampled = over_sample(X_train, y_train, l=10000)
+
+
+# In[33]:
+
+y_sampled.sum()
+
+
+# In[35]:
+
+from sklearn.ensemble import RandomForestClassifier
+
+rf = RandomForestClassifier(n_estimators = 100, 
+                            max_features = 'sqrt',
+                            bootstrap = True, 
+                            oob_score = True,
+                            n_jobs = -1,
+                            random_state = 14113,
+                            class_weight = 'balanced_subsample')
+
+rf.fit(X_sampled, y_sampled)
+print('The oob error for this random forest is {}'.format(rf.oob_score_.round(5)))
+
+
+# In[38]:
+
+from sklearn.metrics import fbeta_score
+
+predictions = rf.predict(X_validation)
+fbeta_score(np.asarray(y_validation), predictions, beta=2, average='samples')
+
+
+# In[37]:
+
+from sklearn.metrics import precision_recall_fscore_support as score
+
+precision, recall, fscore, support = score(y_validation, predictions)
+Metrics = pd.DataFrame([precision, recall, support], index=['precision', 'recall', 'support'])
 Metrics.columns = y_validation.columns
 Metrics
 
@@ -296,90 +442,32 @@ Metrics
 
 
 
-# ## Same model, different features
+# In[267]:
 
-# In[123]:
+#fitting two RF, one for small and one for large sample size
+# great but need to include other classes, otherwise it will always predict one of these when maybe it is not. 
+cols=y_train.sum()[y_train.sum()<500].index #classes with less than 500 samples.
 
-#currious to try this model on raw data with PCA.... maybe PCA will explain trends
-#while looseing the location based information that is not reevent to the calssification. 
-tagged_df = y_train.head()
-tagged_df.reset_index(drop=True, inplace=True)
+#make a small train
+y_train_small = y_train[cols] #y train for only small classes
+y_train_small = y_train_small[(y_train_small.T != 0).any()] #remove rows(images) without these classes
+#subset x for only images in y_train_small
+X_train_small = X_train.ix[list(y_train_small.index)]
 
+#make a small validation
+y_validation_small = y_validation[cols] #y train for only small classes
+y_validation_small = y_validation_small[(y_validation_small.T != 0).any()] #remove rows(images) without these classes
+#subset x for only images in y_train_small
+X_validation_small = X_validation.ix[list(y_validation_small.index)]
 
-# In[124]:
+rf.fit(X_train_small, y_train_small)
+print('The oob error for this random forest is {}'.format(rf.oob_score_.round(2)))
 
-def load_training_data(ftype='jpg'):
-    train_imgs = []
-    labels = []
-    im_names = []
-    print('Loading {} image dataset'.format(ftype))
-    path = os.path.join(cwd, '..', 'data','train-{}'.format(ftype),'*.'+ftype)
-    files = glob.glob(path)
-    for fs in files:
-        img = imread(fs)
-        # img = transform.resize(img, output_shape=(h,w,d), preserve_range=True)  if needed
-        train_imgs.append(img)
-        
-        imname = os.path.basename(fs).split('.')[0]
-        im_names.append(imname)
-        
-        labels_temp = tagged_df.loc[imname]
-        labels.append(labels_temp)
-        
-        
-        
-    train_imgs = np.asarray(train_imgs)
-    return train_imgs, labels, im_names
+predictions = rf.predict(X_validation_small)
+fbeta_score(np.asarray(y_validation_small), predictions, beta=2, average='samples')
 
-
-# In[7]:
-
-X_train, y_train, names_train = load_training_data()
-
-
-
-# In[104]:
-
-names_train
-
-
-# In[108]:
-
-cwd
-
-
-# In[ ]:
-
-def make_raw_pixel_features():
-    red = X_train[:,:,:,0].reshape(100, 256*256) # row of red pixel features for all images
-    green = X_train[:,:,:,1].reshape(100, 256*256) # row of blue pixel features for all images
-    blue = X_train[:,:,:,2].reshape(100, 256*256) #row of green pixel features for all images
-
-    #Format as one dataframe with 196608 features.
-    #one row of features for each image
-    red = pd.DataFrame(red, index=names_train)
-    red.columns = ['red_' + str(x) for x in range(0,256*256)] #create column names
-    red.reset_index(inplace=True) #set index for the merge later on
-    green = pd.DataFrame(green, index=names_train)
-    green.columns = ['green_' + str(x) for x in range(0,256*256)]
-    green.reset_index(inplace=True)
-    blue = pd.DataFrame(blue, index=names_train)
-    blue.columns = ['blue_' + str(x) for x in range(0,256*256)]
-    blue.reset_index(inplace=True)
-
-    #Merge into one large dataframe
-    X_train_rows = pd.merge(red, green, on='index')
-    X_train_rows = pd.merge(X_train_rows, blue, on='index').set_index('index')
-    return X_train_rows
-
-
-# In[ ]:
-
-X_train_rows = make_raw_pixel_features()
-X_train_rows.head()
-
-
-# In[ ]:
-
-#Some PCA or SVD
+precision, recall, fscore, support = score(y_validation_small, predictions)
+Metrics = pd.DataFrame([precision, recall, support], index=['precision', 'recall', 'support'])
+Metrics.columns = y_validation_small.columns
+Metrics
 
