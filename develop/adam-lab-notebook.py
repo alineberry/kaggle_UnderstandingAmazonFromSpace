@@ -3,7 +3,7 @@
 
 # # Exploratory Data Analysis
 
-# In[5]:
+# In[1]:
 
 import pandas as pd
 import numpy as np
@@ -23,7 +23,7 @@ import scipy
 
 # ### Import the custom KaggleAmazonMain module
 
-# In[6]:
+# In[2]:
 
 cwd = os.getcwd()
 path = os.path.join(cwd, '..', 'src')
@@ -34,7 +34,7 @@ del cwd, path
 import KaggleAmazonMain
 
 
-# In[201]:
+# In[3]:
 
 reload(KaggleAmazonMain)
 
@@ -43,12 +43,7 @@ reload(KaggleAmazonMain)
 
 # Load from pickle unless something has changed:
 
-# In[ ]:
-
-
-
-
-# In[196]:
+# In[4]:
 
 X = pd.read_pickle('X.pkl')
 y = pd.read_pickle('y.pkl')

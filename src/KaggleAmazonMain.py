@@ -343,8 +343,79 @@ def binned_mode_features(img, nbins=100):
     mods_diff_b=abs(mo1-mo2)
 
     return mods_diff_r[0], mods_diff_g[0], mods_diff_b[0]
+
+
+def binned_mode_features_with_diagnostics(img, steps):
+    ## red ##
+    #split on mean
+    m=img[:,:,0].flatten().mean()
+    left = img[:,:,0].flatten()[img[:,:,0].flatten()<m]
+    right = img[:,:,0].flatten()[img[:,:,0].flatten()>=m]
+    #find mode in left and right
+    max_ind_left = np.histogram(left, bins=steps, density=False)[0].argsort()[-1:]
+    max_ind_right = np.histogram(right, bins=steps, density=False)[0].argsort()[-1:]
+    #calc bimodal metric
+    mo1 = np.histogram(right, bins=steps, density=False)[1][max_ind_right]
+    mo2 = np.histogram(left, bins=steps, density=False)[1][max_ind_left]
+    mods_diff_r=abs(mo1-mo2)
+    print("The mean of the red distribution is {}".format(m.round(2)))
+    print("After splitting on the mean, the two modes are found at {} and {}".format(mo2, mo1))
+    plt.hist(img[:,:,0].flatten(), color='red', bins=steps)
+    plt.axvline(img[:,:,0].mean(), color='black', linestyle='dashed', linewidth=2)
+    plt.axvline(mo1, color='yellow', linestyle='dashed', linewidth=2)
+    plt.axvline(mo2, color='yellow', linestyle='dashed', linewidth=2)
+    plt.show()
+    
+    ## green ##
+    m=img[:,:,1].flatten().mean()
+    left = img[:,:,1].flatten()[img[:,:,1].flatten()<m]
+    right = img[:,:,1].flatten()[img[:,:,1].flatten()>=m]
+    max_ind_left = np.histogram(left, bins=steps, density=False)[0].argsort()[-1:]
+    max_ind_right = np.histogram(right, bins=steps, density=False)[0].argsort()[-1:]
+    mo1 = np.histogram(right, bins=steps, density=False)[1][max_ind_right]
+    mo2 = np.histogram(left, bins=steps, density=False)[1][max_ind_left]
+    mods_diff_g=abs(mo1-mo2)
+    print("The mean of the green distribution is {}".format(m.round(2)))
+    print("After splitting on the mean, the two modes are found at {} and {}".format(mo2, mo1))
+    plt.hist(img[:,:,1].flatten(), color='green', bins=steps)
+    plt.axvline(img[:,:,1].mean(), color='black', linestyle='dashed', linewidth=2)
+    plt.axvline(mo1, color='yellow', linestyle='dashed', linewidth=2)
+    plt.axvline(mo2, color='yellow', linestyle='dashed', linewidth=2)
+    plt.show()
+    
+    ## blue ##
+    m=img[:,:,2].flatten().mean()
+    left = img[:,:,2].flatten()[img[:,:,2].flatten()<m]
+    right = img[:,:,2].flatten()[img[:,:,2].flatten()>=m]
+    max_ind_left = np.histogram(left, bins=steps, density=False)[0].argsort()[-1:]
+    max_ind_right = np.histogram(right, bins=steps, density=False)[0].argsort()[-1:]
+    mo1 = np.histogram(right, bins=steps, density=False)[1][max_ind_right]
+    mo2 = np.histogram(left, bins=steps, density=False)[1][max_ind_left]
+    mods_diff_b=abs(mo1-mo2)
+    print("The mean of the blue distribution is {}".format(m.round(2)))
+    print("After splitting on the mean, the two modes are found at {} and {}".format(mo2, mo1))
+    plt.hist(img[:,:,2].flatten(), color='blue', bins=steps)
+    plt.axvline(img[:,:,2].mean(), color='black', linestyle='dashed', linewidth=2)
+    plt.axvline(mo1, color='yellow', linestyle='dashed', linewidth=2)
+    plt.axvline(mo2, color='yellow', linestyle='dashed', linewidth=2)
+    plt.show()
+    
+    return mods_diff_r[0].round(2), mods_diff_g[0].round(2), mods_diff_b[0].round(2)
                       
-                      
+
+#function to plot distributions of a featur by class label
+def plot_a_feature_by_labels(feature, X, y):
+    plt.rcParams['figure.figsize'] = (10, 20)
+    colors = cm.rainbow(np.linspace(0, 1, len(y.columns))) #pick colors for plots by labels
+    for i in np.arange(0, len(y.columns)-1):
+        col=y.columns[i]
+        ind_list = y[y[col]==1].index.tolist()
+        X.ix[ind_list][feature].hist(bins=25, color=colors[i])
+        plt.title(col)
+        plt.grid(True)
+        plt.subplot(6,3,i+1) 
+        #plt.xlim(0,X_train[feature].max())
+        #plt.axvline(X_train[feature].mean(), color='black', linestyle='dashed', linewidth=2) #fix this to plot mean 
                       
                       
                       
