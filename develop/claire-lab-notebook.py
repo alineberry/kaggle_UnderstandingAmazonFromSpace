@@ -3,7 +3,7 @@
 
 # # Exploratory Data Analysis
 
-# In[71]:
+# In[1]:
 
 import pandas as pd
 import numpy as np
@@ -19,7 +19,7 @@ import math
 from importlib import reload
 
 
-# In[72]:
+# In[2]:
 
 cwd = os.getcwd()
 path = os.path.join(cwd, '..', 'src')
@@ -29,12 +29,12 @@ if not path in sys.path:
 import KaggleAmazonMain as kam
 
 
-# In[73]:
+# In[3]:
 
 reload(kam)
 
 
-# In[74]:
+# In[4]:
 
 #Load from pickle unless something has changed
 X = pd.read_pickle('X_train.pkl')
@@ -43,7 +43,7 @@ y[y > 1] = 1 #fix labels accidently labels twice. mistake in tagging. oops.
 X_sample, labels, names_train, tagged_df = kam.load_sample_training_data() #load sample data for plotting
 
 
-# In[75]:
+# In[5]:
 
 #Barplot of tag counts
 get_ipython().magic('matplotlib inline')
@@ -56,7 +56,7 @@ def plot_sample_size(tagged_df):
 plot_sample_size(tagged_df)
 
 
-# In[76]:
+# In[6]:
 
 kam.plot_samples(X_sample, names_train, tagged_df, nrow=4, ncol=4)
 
@@ -66,7 +66,7 @@ kam.plot_samples(X_sample, names_train, tagged_df, nrow=4, ncol=4)
 # Feature engineering explores the feature data, and does feature creation.
 # Each image consists of pixel values in red, geen, and blue color schemes. The patterns in these pixels will  have useful trends for classifying the objects in the images and the image types. Notice how the statistical distributions of the red, green, and blue, pixels differ for different types of tags.
 
-# In[77]:
+# In[7]:
 
 fig, axes = plt.subplots(1, 3, figsize=(10, 6))
 axes[0].imshow(X_sample[1,:,:,0], cmap='Reds')
@@ -74,7 +74,7 @@ axes[1].imshow(X_sample[1,:,:,1], cmap='Greens')
 axes[2].imshow(X_sample[1,:,:,2], cmap='Blues')
 
 
-# In[78]:
+# In[8]:
 
 plt.subplots_adjust(wspace=0, hspace=0)
 for i in range(0,3):
@@ -91,7 +91,7 @@ for i in range(0,3):
 # 
 # binned mode differences is a feature created to discribe bimodal distributions. A lot of the r g b distributions are bimodal, which could offer interesting insight into the  classificatioin, so I created a feature to capture bimodal patterns in the r g b pixel distributions. The binned mode differences is simply the differnce between the two min bounds of the two largest count bins, or the two modes. If this value is large, then the two larges modes are a large distance from eachother, indicating the distribution is bimodal.
 
-# In[79]:
+# In[9]:
 
 #Binned mode differences
 
@@ -159,7 +159,7 @@ binned_mode_features_with_diagnostics(img, steps)
 
 # Also created sobel features. blah blah blah about those
 
-# In[80]:
+# In[10]:
 
 from skimage.color import rgb2gray
 from skimage import transform, img_as_float, filters
@@ -171,14 +171,14 @@ for i in range(X_train_g.shape[0]):
 X_train_sobel = np.asarray(X_train_sobel)
 
 
-# In[81]:
+# In[11]:
 
 kam.plot_samples(X_train_sobel, names_train, tagged_df, 4,4)
 
 
 # Check out the features that were made... See if they describe separation of  classes. 
 
-# In[82]:
+# In[12]:
 
 plt.rcParams['figure.figsize'] = (10, 20)
 
@@ -207,18 +207,18 @@ plot_a_feature_by_labels('sobel_colmean_std')
 
 # # Random Forest
 
-# In[83]:
+# In[13]:
 
 from sklearn.model_selection import train_test_split
 X_train, X_validation, y_train, y_validation = train_test_split(X, y, test_size=0.40, random_state=14113)
 
 
-# In[84]:
+# In[14]:
 
 y.sum() #these are the sample sizes per class
 
 
-# In[85]:
+# In[15]:
 
 from sklearn.ensemble import RandomForestClassifier
 
@@ -231,13 +231,13 @@ rf = RandomForestClassifier(n_estimators = 100,
                             class_weight = 'balanced_subsample')
 
 
-# In[86]:
+# In[16]:
 
 rf.fit(X_train, y_train)
 print('The oob error for this random forest is {}'.format(rf.oob_score_.round(2)))
 
 
-# In[87]:
+# In[17]:
 
 #features ranking of features. 
 
@@ -259,7 +259,7 @@ plot_feature_importance(Feature_importance, 10)
 
 # ## F2-score and other metrics
 
-# In[88]:
+# In[18]:
 
 from sklearn.metrics import fbeta_score
 np.asarray(y_validation)
@@ -274,7 +274,7 @@ fbeta_score(np.asarray(y_validation), predictions, beta=2, average='samples')
 # support is the same size of images with that label in the training data. 
 # blah blah blah add descriptions of these metrics 
 
-# In[89]:
+# In[19]:
 
 #calc some other scoring metrics. precision, recall, and f1.
 #The confusion matrix is diddicult to make and read for miltilabel classificatoin, but this table shows the same information 
@@ -287,10 +287,13 @@ Metrics.columns = y_validation.columns
 Metrics
 
 
-# In[90]:
+# Trying to show recall increases with sample size, but its hard to see all the small sample points because they are so clustered. Basically, recall for sample size less than 2000 is generally poor, so we will focus on those samples.
+
+# In[20]:
 
 #Plot recall by sample size
 # to show sample size thresh where recall is ok
+
 colors=cm.summer(np.linspace(0, 1, len(Metrics.ix['support'])))
 plt.scatter(Metrics.ix['support'], Metrics.ix['recall'], c=colors, alpha=0.5)
 plt.show()
@@ -298,14 +301,14 @@ plt.show()
 
 # ## Diagnostics
 
-# In[91]:
+# In[21]:
 
 probs = rf.predict_proba(X_validation)
 
 
 # ROC curves visualize performance of a class/binary classifier. Visualization of how predicted probabilities compare to the truth. 
 
-# In[92]:
+# In[22]:
 
 from sklearn import metrics
 
@@ -334,7 +337,7 @@ plot_ROC('agriculture')
 plot_ROC('bare_ground')
 
 
-# In[93]:
+# In[23]:
 
 def plot_decision_hist(tag):
     '''
@@ -383,7 +386,7 @@ plot_decision_hist('bare_ground')
 
 # The imbalanced-learn library imblearn has great modules for oversampling. WE are usign oeversampling because undersampling leads to loss of information, and some classes are very small so it would also lead to a very small dataset. Note oversampling can lead to overfitting the samller classes... Didn't work with multiclasses. I wrote my oen function for oversampling. It oversamples classes smaller than l up to size l by repeating a relabeled image the same as the randomly sampled image. 
 
-# In[138]:
+# In[24]:
 
 #randomly over sample
 
@@ -410,12 +413,12 @@ X_train, X_validation, y_train, y_validation = train_test_split(X, y, test_size=
 X_upsampled, y_upsampled = over_sample(X=X_train, y=y_train, l=10000)
 
 
-# In[140]:
+# In[25]:
 
 y_upsampled.sum()
 
 
-# In[142]:
+# In[26]:
 
 from sklearn.ensemble import RandomForestClassifier
 
@@ -431,7 +434,7 @@ rf.fit(X_upsampled, y_upsampled)
 print('The oob error for this random forest is {}'.format(rf.oob_score_.round(5)))
 
 
-# In[143]:
+# In[27]:
 
 from sklearn.metrics import fbeta_score
 
@@ -439,7 +442,7 @@ predictions = rf.predict(X_validation)
 fbeta_score(np.asarray(y_validation), predictions, beta=2, average='samples')
 
 
-# In[144]:
+# In[28]:
 
 from sklearn.metrics import precision_recall_fscore_support as score
 
@@ -454,7 +457,7 @@ Metrics
 # 
 # Start with bare_ground example, since we have seen its poor performance in the RF. 
 
-# In[95]:
+# In[29]:
 
 #Perform LR on these classes. 
 l=2000
@@ -464,13 +467,13 @@ cols
 
 # Adding a 10-fold cv cause it is needed for LR model. So bootstrapping like the RF
 
-# In[145]:
+# In[ ]:
 
 #Lin reg model
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_val_score
 
-lr = LogisticRegression(random_state=1, class_weight='balanced', )
+lr = LogisticRegression(random_state=1, class_weight='balanced')
 # 10-Fold Cross Validation
 scores = cross_val_score(lr, X_upsampled, y_upsampled['bare_ground'], cv=10)
 
@@ -479,7 +482,7 @@ print("cross validation scores {}".format(scores)) #the cross_val_score uses the
 print("Average cross validation accuracy scores: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
 
 
-# In[146]:
+# In[31]:
 
 #Metrics and distrubtion plot
 lr.fit(X_upsampled, y_upsampled['bare_ground'])
@@ -493,6 +496,33 @@ print('{} percent of the feature have been removed by setting the coefficents to
 
 from sklearn.metrics import fbeta_score
 print("The new f2 score for this class is: {}".format(fbeta_score(np.asarray(y_validation['bare_ground']), pred_lr, beta=2))) #This is the score now... 
+n = np.where(y_validation.columns== 'bare_ground')[0][0]
+print("The f2 score from the multiclass RF is: {}".format(fbeta_score(np.asarray(y_validation['bare_ground']), predictions[:,n], beta=2))) #but this is what it was before
+
+
+# In[57]:
+
+# try a RF
+#RF for larger classes
+rf = RandomForestClassifier(n_estimators = 100, 
+                            max_features = 'sqrt',
+                            bootstrap = True, 
+                            oob_score = True,
+                            n_jobs = -1,
+                            random_state = 14113,
+                            class_weight = 'balanced_subsample')
+
+rf.fit(X_upsampled, y_upsampled['bare_ground'])
+print('The oob error for this random forest is {}'.format(rf.oob_score_.round(5)))
+
+
+preds_rf = rf.predict(X_validation)
+print("this F2 score is : {}".format(fbeta_score(np.asarray(y_validation['bare_ground']), preds_rf, beta=2)))
+
+
+# In[ ]:
+
+print("The new f2 score for this class is: {}".format(fbeta_score(np.asarray(y_validation['bare_ground']), preds_rf, beta=2))) #This is the score now... 
 n = np.where(y_validation.columns== 'bare_ground')[0][0]
 print("The f2 score from the multiclass RF is: {}".format(fbeta_score(np.asarray(y_validation['bare_ground']), predictions[:,n], beta=2))) #but this is what it was before
 
@@ -551,6 +581,8 @@ tag='bare_ground'
 micro_model_dist_plot(tag, probs)
 
 
+# # Put it all together
+
 # In[ ]:
 
 #pick threshold. 
@@ -568,14 +600,15 @@ micro_model_dist_plot(tag, probs)
 #Mini Models
 
 
-# In[153]:
+# In[26]:
 
+#The smaller classes will use a LR model
 l=2000
 cols_small=y.sum()[y.sum()<l].index
 cols_large=y.sum()[y.sum()>=l].index
 
 
-# In[154]:
+# In[27]:
 
 X_train, X_validation, y_train, y_validation = train_test_split(X, y, test_size=0.40, random_state=14113)
 X_upsampled, y_upsampled = over_sample(X=X_train, y=y_train, l=10000)
@@ -587,7 +620,7 @@ y_validation_mini = y_validation[cols_small]
 y_validation_large = y_validation[cols_large]
 
 
-# In[155]:
+# In[29]:
 
 #RF for larger classes
 rf = RandomForestClassifier(n_estimators = 100, 
@@ -603,28 +636,44 @@ print('The oob error for this random forest is {}'.format(rf.oob_score_.round(5)
 
 
 predictions = rf.predict(X_validation)
-fbeta_score(np.asarray(y_validation_large), predictions, beta=2, average='samples')
+print("this F2 score is : {}".format(fbeta_score(np.asarray(y_validation_large), predictions, beta=2, average='samples')))
 
 
-# In[159]:
+# In[36]:
 
 # LR for all smaller classes
-
-def mini_models():
-    df=[]
+from sklearn.linear_model import LogisticRegression
+def mini_models(cols_small):
+    df = pd.DataFrame()
     for c in cols_small:
-        lr = LogisticRegression(random_state=1, class_weight='balanced', )
+        lr = LogisticRegression(random_state=1, class_weight='balanced')
         lr.fit(X_upsampled, y_train_mini[c])
         pred_lr = lr.predict(X_validation)
         df[c] = pred_lr
     return df
-
-mini_pred = mini_models()
-
-
-# In[ ]:
+preds_mini = mini_models(cols_small)
 
 
+# In[52]:
+
+#put RF scores and LR scores together
+preds_large = pd.DataFrame(predictions)
+preds_large.columns=cols_large
+preds_all = pd.concat([preds_large, preds_mini], axis=1, join_axes=[preds_large.index])
+y_validation_all = pd.concat([y_validation[cols_large], y_validation[cols_small]], axis=1, join_axes=[y_validation.index])
+
+
+precision, recall, fscore, support = score(y_validation_all, preds_all)
+Metrics = pd.DataFrame([precision, recall, support], index=['precision', 'recall', 'support'])
+Metrics.columns = y_validation_all.columns
+Metrics
+
+
+# In[51]:
+
+#calc F2 score from that. 
+print("this F2 score for this weird ensemble method is : {}".format(
+    fbeta_score(np.asarray(y_validation), preds_all, beta=2, average='samples')))
 
 
 # In[ ]:
