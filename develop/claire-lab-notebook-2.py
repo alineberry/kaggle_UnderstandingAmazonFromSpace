@@ -162,7 +162,7 @@ kam.plot_a_feature_by_labels('sobel_colmean_std', X, y)
 
 # # Random Forest
 
-# In[13]:
+# In[34]:
 
 from sklearn.model_selection import train_test_split
 X_train, X_validation, y_train, y_validation = train_test_split(X, y, test_size=0.40, random_state=14113)
@@ -191,11 +191,6 @@ rf = RandomForestClassifier(n_estimators = 100,
 rf.fit(X_train, y_train)
 print('The oob error for this random forest is {}'.format(rf.oob_score_.round(2)))
 
-
-# # Feature Engineering
-# What type of features are we working with here?
-# Feature engineering explores the feature data, and does feature creation.
-# Each image consists of pixel values in red, geen, and blue color schemes. The patterns in these pixels will  have useful trends for classifying the objects in the images and the image types. Notice how the statistical distributions of the red, green, and blue, pixels differ for different types of tags.
 
 # In[17]:
 
@@ -346,7 +341,12 @@ plot_decision_hist('bare_ground')
 
 # The imbalanced-learn library imblearn has great modules for oversampling. WE are usign oeversampling because undersampling leads to loss of information, and some classes are very small so it would also lead to a very small dataset. Note oversampling can lead to overfitting the samller classes... Didn't work with multiclasses. I wrote my oen function for oversampling. It oversamples classes smaller than l up to size l by repeating a relabeled image the same as the randomly sampled image. 
 
-# In[24]:
+# In[44]:
+
+X.drop(['hough_skew','hough_kurtosis'], axis=1, inplace=True)
+
+
+# In[45]:
 
 #randomly over sample
 
@@ -373,25 +373,78 @@ X_train, X_validation, y_train, y_validation = train_test_split(X, y, test_size=
 X_upsampled, y_upsampled = over_sample(X=X_train, y=y_train, l=10000)
 
 
-# In[25]:
+# In[46]:
 
 y_upsampled.sum()
 
 
-# In[26]:
+# In[47]:
 
 from sklearn.ensemble import RandomForestClassifier
 
-rf = RandomForestClassifier(n_estimators = 100, 
+rf = RandomForestClassifier(n_estimators = 300, 
                             max_features = 'sqrt',
                             bootstrap = True, 
-                            oob_score = True,
+                            oob_score = False,
                             n_jobs = -1,
                             random_state = 14113,
-                            class_weight = 'balanced_subsample')
+                            class_weight = 'balanced')
 
 rf.fit(X_upsampled, y_upsampled)
-print('The oob error for this random forest is {}'.format(rf.oob_score_.round(5)))
+
+
+# In[48]:
+
+from sklearn.metrics import fbeta_score
+
+probs = rf.predict_proba(X_validation)
+predictions = kam.get_prediction_matrix(probs, 0.25)
+
+score = fbeta_score(np.asarray(y_validation), predictions, beta=2, average='samples')
+
+print('F2 score: ', score)
+
+
+# In[57]:
+
+from sklearn.ensemble import ExtraTreesClassifier
+
+
+# In[58]:
+
+et = ExtraTreesClassifier(n_estimators = 300,
+                          n_jobs = -1,
+                          random_state = 14113,
+                          class_weight = 'balanced')
+
+et.fit(X_upsampled, y_upsampled)
+
+
+# In[59]:
+
+probs = et.predict_proba(X_validation)
+predictions = kam.get_prediction_matrix(probs, 0.25)
+
+score = fbeta_score(np.asarray(y_validation), predictions, beta=2, average='samples')
+
+print('F2 score: ', score)
+
+
+# In[60]:
+
+from sklearn.ensemble import AdaBoostClassifier
+
+
+# In[63]:
+
+ab = AdaBoostClassifier(random_state = 14113)
+
+ab.fit(X_upsampled, y_upsampled)
+
+
+# In[ ]:
+
+
 
 
 # In[27]:
@@ -402,7 +455,7 @@ predictions = rf.predict(X_validation)
 fbeta_score(np.asarray(y_validation), predictions, beta=2, average='samples')
 
 
-# In[28]:
+# In[49]:
 
 from sklearn.metrics import precision_recall_fscore_support as score
 
@@ -560,7 +613,7 @@ micro_model_dist_plot(tag, probs)
 #Mini Models
 
 
-# In[26]:
+# In[50]:
 
 #The smaller classes will use a LR model
 l=2000
@@ -568,7 +621,7 @@ cols_small=y.sum()[y.sum()<l].index
 cols_large=y.sum()[y.sum()>=l].index
 
 
-# In[27]:
+# In[51]:
 
 X_train, X_validation, y_train, y_validation = train_test_split(X, y, test_size=0.40, random_state=14113)
 X_upsampled, y_upsampled = over_sample(X=X_train, y=y_train, l=10000)
@@ -580,7 +633,7 @@ y_validation_mini = y_validation[cols_small]
 y_validation_large = y_validation[cols_large]
 
 
-# In[29]:
+# In[52]:
 
 #RF for larger classes
 rf = RandomForestClassifier(n_estimators = 100, 
@@ -599,7 +652,7 @@ predictions = rf.predict(X_validation)
 print("this F2 score is : {}".format(fbeta_score(np.asarray(y_validation_large), predictions, beta=2, average='samples')))
 
 
-# In[36]:
+# In[53]:
 
 # LR for all smaller classes
 from sklearn.linear_model import LogisticRegression
@@ -614,7 +667,7 @@ def mini_models(cols_small):
 preds_mini = mini_models(cols_small)
 
 
-# In[52]:
+# In[54]:
 
 #put RF scores and LR scores together
 preds_large = pd.DataFrame(predictions)
@@ -629,11 +682,11 @@ Metrics.columns = y_validation_all.columns
 Metrics
 
 
-# In[51]:
+# In[56]:
 
 #calc F2 score from that. 
 print("this F2 score for this weird ensemble method is : {}".format(
-    fbeta_score(np.asarray(y_validation), preds_all, beta=2, average='samples')))
+    fbeta_score(np.asarray(y_validation_all), preds_all, beta=2, average='samples')))
 
 
 # In[ ]:

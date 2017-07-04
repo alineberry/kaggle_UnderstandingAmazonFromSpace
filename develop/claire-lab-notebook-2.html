@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8" />
-<title>claire-lab-notebook</title>
+<title>claire-lab-notebook-2</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
@@ -50011,7 +50011,7 @@ rkJggg==
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[34]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">train_test_split</span>
@@ -50117,18 +50117,6 @@ dtype: int64</pre>
 </div>
 </div>
 
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Feature-Engineering">Feature Engineering<a class="anchor-link" href="#Feature-Engineering">&#182;</a></h1><p>What type of features are we working with here?
-Feature engineering explores the feature data, and does feature creation.
-Each image consists of pixel values in red, geen, and blue color schemes. The patterns in these pixels will  have useful trends for classifying the objects in the images and the image types. Notice how the statistical distributions of the red, green, and blue, pixels differ for different types of tags.</p>
-
-</div>
-</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -52066,7 +52054,20 @@ SOKUCEREEqdEICKSOCUCEZHE/X8IlhkdLfPFHQAAAABJRU5ErkJggg==
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[24]:</div>
+<div class="prompt input_prompt">In&nbsp;[44]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;hough_skew&#39;</span><span class="p">,</span><span class="s1">&#39;hough_kurtosis&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[45]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#randomly over sample</span>
@@ -52101,7 +52102,7 @@ SOKUCEREEqdEICKSOCUCEZHE/X8IlhkdLfPFHQAAAABJRU5ErkJggg==
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[25]:</div>
+<div class="prompt input_prompt">In&nbsp;[46]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">y_upsampled</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
@@ -52115,27 +52116,27 @@ SOKUCEREEqdEICKSOCUCEZHE/X8IlhkdLfPFHQAAAABJRU5ErkJggg==
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[25]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[46]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>agriculture           47919
-artisinal_mine        11545
-bare_ground           14159
-blooming              10590
-blow_down             10205
-clear                 96613
-cloudy                10084
-conventional_mine     10466
-cultivation           26345
-habitation            24935
-haze                  12696
-partly_cloudy         24781
-primary              131819
-road                  42647
-selective_logging     10788
-slash_burn            10713
-water                 35875
+<pre>agriculture           47869
+artisinal_mine        11588
+bare_ground           14228
+blooming              10607
+blow_down             10217
+clear                 96685
+cloudy                10080
+conventional_mine     10411
+cultivation           26461
+habitation            24845
+haze                  12695
+partly_cloudy         24714
+primary              131833
+road                  42651
+selective_logging     10744
+slash_burn            10697
+water                 35695
 dtype: int64</pre>
 </div>
 
@@ -52147,21 +52148,62 @@ dtype: int64</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[26]:</div>
+<div class="prompt input_prompt">In&nbsp;[47]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="k">import</span> <span class="n">RandomForestClassifier</span>
 
-<span class="n">rf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_estimators</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> 
+<span class="n">rf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_estimators</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span> 
                             <span class="n">max_features</span> <span class="o">=</span> <span class="s1">&#39;sqrt&#39;</span><span class="p">,</span>
                             <span class="n">bootstrap</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> 
-                            <span class="n">oob_score</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                            <span class="n">oob_score</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                             <span class="n">n_jobs</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
                             <span class="n">random_state</span> <span class="o">=</span> <span class="mi">14113</span><span class="p">,</span>
-                            <span class="n">class_weight</span> <span class="o">=</span> <span class="s1">&#39;balanced_subsample&#39;</span><span class="p">)</span>
+                            <span class="n">class_weight</span> <span class="o">=</span> <span class="s1">&#39;balanced&#39;</span><span class="p">)</span>
 
 <span class="n">rf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_upsampled</span><span class="p">,</span> <span class="n">y_upsampled</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The oob error for this random forest is </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rf</span><span class="o">.</span><span class="n">oob_score_</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">5</span><span class="p">)))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[47]:</div>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>RandomForestClassifier(bootstrap=True, class_weight=&#39;balanced&#39;,
+            criterion=&#39;gini&#39;, max_depth=None, max_features=&#39;sqrt&#39;,
+            max_leaf_nodes=None, min_impurity_split=1e-07,
+            min_samples_leaf=1, min_samples_split=2,
+            min_weight_fraction_leaf=0.0, n_estimators=300, n_jobs=-1,
+            oob_score=False, random_state=14113, verbose=0,
+            warm_start=False)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[48]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">fbeta_score</span>
+
+<span class="n">probs</span> <span class="o">=</span> <span class="n">rf</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_validation</span><span class="p">)</span>
+<span class="n">predictions</span> <span class="o">=</span> <span class="n">kam</span><span class="o">.</span><span class="n">get_prediction_matrix</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">)</span>
+
+<span class="n">score</span> <span class="o">=</span> <span class="n">fbeta_score</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y_validation</span><span class="p">),</span> <span class="n">predictions</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;samples&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;F2 score: &#39;</span><span class="p">,</span> <span class="n">score</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -52174,11 +52216,186 @@ dtype: int64</pre>
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>The oob error for this random forest is 0.99903
+<pre>F2 score:  0.887465424003
 </pre>
 </div>
 </div>
 
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[57]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="k">import</span> <span class="n">ExtraTreesClassifier</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[58]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">et</span> <span class="o">=</span> <span class="n">ExtraTreesClassifier</span><span class="p">(</span><span class="n">n_estimators</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span>
+                          <span class="n">n_jobs</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                          <span class="n">random_state</span> <span class="o">=</span> <span class="mi">14113</span><span class="p">,</span>
+                          <span class="n">class_weight</span> <span class="o">=</span> <span class="s1">&#39;balanced&#39;</span><span class="p">)</span>
+
+<span class="n">et</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_upsampled</span><span class="p">,</span> <span class="n">y_upsampled</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[58]:</div>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>ExtraTreesClassifier(bootstrap=False, class_weight=&#39;balanced&#39;,
+           criterion=&#39;gini&#39;, max_depth=None, max_features=&#39;auto&#39;,
+           max_leaf_nodes=None, min_impurity_split=1e-07,
+           min_samples_leaf=1, min_samples_split=2,
+           min_weight_fraction_leaf=0.0, n_estimators=300, n_jobs=-1,
+           oob_score=False, random_state=14113, verbose=0,
+           warm_start=False)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[59]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">probs</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_validation</span><span class="p">)</span>
+<span class="n">predictions</span> <span class="o">=</span> <span class="n">kam</span><span class="o">.</span><span class="n">get_prediction_matrix</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">)</span>
+
+<span class="n">score</span> <span class="o">=</span> <span class="n">fbeta_score</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y_validation</span><span class="p">),</span> <span class="n">predictions</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;samples&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;F2 score: &#39;</span><span class="p">,</span> <span class="n">score</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>F2 score:  0.882248143642
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[60]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="k">import</span> <span class="n">AdaBoostClassifier</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[63]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ab</span> <span class="o">=</span> <span class="n">AdaBoostClassifier</span><span class="p">(</span><span class="n">random_state</span> <span class="o">=</span> <span class="mi">14113</span><span class="p">)</span>
+
+<span class="n">ab</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_upsampled</span><span class="p">,</span> <span class="n">y_upsampled</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">ValueError</span>                                Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-63-218456c0b75b&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-intense-fg ansi-bold">      1</span> ab <span class="ansi-yellow-intense-fg ansi-bold">=</span> AdaBoostClassifier<span class="ansi-yellow-intense-fg ansi-bold">(</span>random_state <span class="ansi-yellow-intense-fg ansi-bold">=</span> <span class="ansi-cyan-intense-fg ansi-bold">14113</span><span class="ansi-yellow-intense-fg ansi-bold">)</span>
+<span class="ansi-green-intense-fg ansi-bold">      2</span> 
+<span class="ansi-green-fg">----&gt; 3</span><span class="ansi-red-fg"> </span>ab<span class="ansi-yellow-intense-fg ansi-bold">.</span>fit<span class="ansi-yellow-intense-fg ansi-bold">(</span>X_upsampled<span class="ansi-yellow-intense-fg ansi-bold">,</span> y_upsampled<span class="ansi-yellow-intense-fg ansi-bold">)</span>
+
+<span class="ansi-green-fg">C:\Users\ablin\Anaconda3\lib\site-packages\sklearn\ensemble\weight_boosting.py</span> in <span class="ansi-cyan-fg">fit</span><span class="ansi-blue-fg">(self, X, y, sample_weight)</span>
+<span class="ansi-green-intense-fg ansi-bold">    409</span> 
+<span class="ansi-green-intense-fg ansi-bold">    410</span>         <span class="ansi-red-intense-fg ansi-bold"># Fit</span>
+<span class="ansi-green-fg">--&gt; 411</span><span class="ansi-red-fg">         </span><span class="ansi-green-intense-fg ansi-bold">return</span> super<span class="ansi-yellow-intense-fg ansi-bold">(</span>AdaBoostClassifier<span class="ansi-yellow-intense-fg ansi-bold">,</span> self<span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">.</span>fit<span class="ansi-yellow-intense-fg ansi-bold">(</span>X<span class="ansi-yellow-intense-fg ansi-bold">,</span> y<span class="ansi-yellow-intense-fg ansi-bold">,</span> sample_weight<span class="ansi-yellow-intense-fg ansi-bold">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    412</span> 
+<span class="ansi-green-intense-fg ansi-bold">    413</span>     <span class="ansi-green-intense-fg ansi-bold">def</span> _validate_estimator<span class="ansi-yellow-intense-fg ansi-bold">(</span>self<span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
+
+<span class="ansi-green-fg">C:\Users\ablin\Anaconda3\lib\site-packages\sklearn\ensemble\weight_boosting.py</span> in <span class="ansi-cyan-fg">fit</span><span class="ansi-blue-fg">(self, X, y, sample_weight)</span>
+<span class="ansi-green-intense-fg ansi-bold">    109</span> 
+<span class="ansi-green-intense-fg ansi-bold">    110</span>         X, y = check_X_y(X, y, accept_sparse=accept_sparse, dtype=dtype,
+<span class="ansi-green-fg">--&gt; 111</span><span class="ansi-red-fg">                          y_numeric=is_regressor(self))
+</span><span class="ansi-green-intense-fg ansi-bold">    112</span> 
+<span class="ansi-green-intense-fg ansi-bold">    113</span>         <span class="ansi-green-intense-fg ansi-bold">if</span> sample_weight <span class="ansi-green-intense-fg ansi-bold">is</span> <span class="ansi-green-intense-fg ansi-bold">None</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
+
+<span class="ansi-green-fg">C:\Users\ablin\Anaconda3\lib\site-packages\sklearn\utils\validation.py</span> in <span class="ansi-cyan-fg">check_X_y</span><span class="ansi-blue-fg">(X, y, accept_sparse, dtype, order, copy, force_all_finite, ensure_2d, allow_nd, multi_output, ensure_min_samples, ensure_min_features, y_numeric, warn_on_dtype, estimator)</span>
+<span class="ansi-green-intense-fg ansi-bold">    524</span>                         dtype=None)
+<span class="ansi-green-intense-fg ansi-bold">    525</span>     <span class="ansi-green-intense-fg ansi-bold">else</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
+<span class="ansi-green-fg">--&gt; 526</span><span class="ansi-red-fg">         </span>y <span class="ansi-yellow-intense-fg ansi-bold">=</span> column_or_1d<span class="ansi-yellow-intense-fg ansi-bold">(</span>y<span class="ansi-yellow-intense-fg ansi-bold">,</span> warn<span class="ansi-yellow-intense-fg ansi-bold">=</span><span class="ansi-green-intense-fg ansi-bold">True</span><span class="ansi-yellow-intense-fg ansi-bold">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    527</span>         _assert_all_finite<span class="ansi-yellow-intense-fg ansi-bold">(</span>y<span class="ansi-yellow-intense-fg ansi-bold">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    528</span>     <span class="ansi-green-intense-fg ansi-bold">if</span> y_numeric <span class="ansi-green-intense-fg ansi-bold">and</span> y<span class="ansi-yellow-intense-fg ansi-bold">.</span>dtype<span class="ansi-yellow-intense-fg ansi-bold">.</span>kind <span class="ansi-yellow-intense-fg ansi-bold">==</span> <span class="ansi-blue-intense-fg ansi-bold">&#39;O&#39;</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
+
+<span class="ansi-green-fg">C:\Users\ablin\Anaconda3\lib\site-packages\sklearn\utils\validation.py</span> in <span class="ansi-cyan-fg">column_or_1d</span><span class="ansi-blue-fg">(y, warn)</span>
+<span class="ansi-green-intense-fg ansi-bold">    560</span>         <span class="ansi-green-intense-fg ansi-bold">return</span> np<span class="ansi-yellow-intense-fg ansi-bold">.</span>ravel<span class="ansi-yellow-intense-fg ansi-bold">(</span>y<span class="ansi-yellow-intense-fg ansi-bold">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    561</span> 
+<span class="ansi-green-fg">--&gt; 562</span><span class="ansi-red-fg">     </span><span class="ansi-green-intense-fg ansi-bold">raise</span> ValueError<span class="ansi-yellow-intense-fg ansi-bold">(</span><span class="ansi-blue-intense-fg ansi-bold">&#34;bad input shape {0}&#34;</span><span class="ansi-yellow-intense-fg ansi-bold">.</span>format<span class="ansi-yellow-intense-fg ansi-bold">(</span>shape<span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    563</span> 
+<span class="ansi-green-intense-fg ansi-bold">    564</span> 
+
+<span class="ansi-red-fg">ValueError</span>: bad input shape (144174, 17)</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+
+</div>
 </div>
 </div>
 
@@ -52225,7 +52442,7 @@ dtype: int64</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[28]:</div>
+<div class="prompt input_prompt">In&nbsp;[49]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">precision_recall_fscore_support</span> <span class="k">as</span> <span class="n">score</span>
@@ -52244,15 +52461,7 @@ dtype: int64</pre>
 <div class="output">
 
 
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>C:\Users\clongo\AppData\Local\Continuum\Anaconda3\lib\site-packages\sklearn\metrics\classification.py:1113: UndefinedMetricWarning: Precision and F-score are ill-defined and being set to 0.0 in labels with no predicted samples.
-  &#39;precision&#39;, &#39;predicted&#39;, average, warn_for)
-</pre>
-</div>
-</div>
-
-<div class="output_area"><div class="prompt output_prompt">Out[28]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[49]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <div>
@@ -52282,51 +52491,51 @@ dtype: int64</pre>
   <tbody>
     <tr>
       <th>precision</th>
-      <td>0.788216</td>
-      <td>0.964286</td>
-      <td>0.357143</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.942766</td>
-      <td>0.839264</td>
+      <td>0.602496</td>
+      <td>0.630769</td>
+      <td>0.408333</td>
+      <td>0.244444</td>
+      <td>0.500000</td>
+      <td>0.890451</td>
+      <td>0.728611</td>
       <td>1.000000</td>
-      <td>0.622768</td>
-      <td>0.777778</td>
-      <td>0.760870</td>
-      <td>0.921902</td>
-      <td>0.971750</td>
-      <td>0.750286</td>
+      <td>0.370422</td>
+      <td>0.536131</td>
+      <td>0.559055</td>
+      <td>0.749407</td>
+      <td>0.958991</td>
+      <td>0.545191</td>
+      <td>0.295455</td>
       <td>0.0</td>
-      <td>0.0</td>
-      <td>0.768116</td>
+      <td>0.450302</td>
     </tr>
     <tr>
       <th>recall</th>
-      <td>0.753760</td>
-      <td>0.385714</td>
-      <td>0.014085</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.961214</td>
-      <td>0.784404</td>
+      <td>0.938841</td>
+      <td>0.585714</td>
+      <td>0.138028</td>
+      <td>0.082707</td>
+      <td>0.043478</td>
+      <td>0.989294</td>
+      <td>0.908257</td>
       <td>0.022727</td>
-      <td>0.155172</td>
-      <td>0.435494</td>
-      <td>0.626118</td>
-      <td>0.753029</td>
-      <td>0.991557</td>
-      <td>0.602572</td>
+      <td>0.590656</td>
+      <td>0.753111</td>
+      <td>0.825581</td>
+      <td>0.900570</td>
+      <td>0.998021</td>
+      <td>0.864360</td>
+      <td>0.092857</td>
       <td>0.0</td>
-      <td>0.0</td>
-      <td>0.288730</td>
+      <td>0.735785</td>
     </tr>
     <tr>
       <th>support</th>
       <td>4987.000000</td>
       <td>140.000000</td>
       <td>355.000000</td>
-      <td>133.0</td>
-      <td>46.0</td>
+      <td>133.000000</td>
+      <td>46.000000</td>
       <td>11396.000000</td>
       <td>872.000000</td>
       <td>44.000000</td>
@@ -52336,7 +52545,7 @@ dtype: int64</pre>
       <td>2806.000000</td>
       <td>15160.000000</td>
       <td>3266.000000</td>
-      <td>140.0</td>
+      <td>140.000000</td>
       <td>86.0</td>
       <td>2937.000000</td>
     </tr>
@@ -52928,7 +53137,7 @@ UVAQEZGMgoKIiGQUFEREJPP/AX7V+BPcGc49AAAAAElFTkSuQmCC
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[26]:</div>
+<div class="prompt input_prompt">In&nbsp;[50]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#The smaller classes will use a LR model</span>
@@ -52944,7 +53153,7 @@ UVAQEZGMgoKIiGQUFEREJPP/AX7V+BPcGc49AAAAAElFTkSuQmCC
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[27]:</div>
+<div class="prompt input_prompt">In&nbsp;[51]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_validation</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_validation</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.40</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">14113</span><span class="p">)</span>
@@ -52964,7 +53173,7 @@ UVAQEZGMgoKIiGQUFEREJPP/AX7V+BPcGc49AAAAAElFTkSuQmCC
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[29]:</div>
+<div class="prompt input_prompt">In&nbsp;[52]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#RF for larger classes</span>
@@ -52994,15 +53203,15 @@ UVAQEZGMgoKIiGQUFEREJPP/AX7V+BPcGc49AAAAAElFTkSuQmCC
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>The oob error for this random forest is 0.99835
-this F2 score is : 0.8542163487955893
+<pre>The oob error for this random forest is 0.99839
+this F2 score is : 0.8520014973386119
 </pre>
 </div>
 </div>
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>C:\Users\clongo\AppData\Local\Continuum\Anaconda3\lib\site-packages\sklearn\metrics\classification.py:1113: UndefinedMetricWarning: F-score is ill-defined and being set to 0.0 in samples with no predicted labels.
+<pre>C:\Users\ablin\Anaconda3\lib\site-packages\sklearn\metrics\classification.py:1113: UndefinedMetricWarning: F-score is ill-defined and being set to 0.0 in samples with no predicted labels.
   &#39;precision&#39;, &#39;predicted&#39;, average, warn_for)
 </pre>
 </div>
@@ -53014,7 +53223,7 @@ this F2 score is : 0.8542163487955893
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[36]:</div>
+<div class="prompt input_prompt">In&nbsp;[53]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># LR for all smaller classes</span>
@@ -53037,7 +53246,7 @@ this F2 score is : 0.8542163487955893
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[52]:</div>
+<div class="prompt input_prompt">In&nbsp;[54]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#put RF scores and LR scores together</span>
@@ -53061,7 +53270,7 @@ this F2 score is : 0.8542163487955893
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[52]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[54]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <div>
@@ -53091,43 +53300,43 @@ this F2 score is : 0.8542163487955893
   <tbody>
     <tr>
       <th>precision</th>
-      <td>0.784167</td>
-      <td>0.945151</td>
-      <td>0.838983</td>
-      <td>0.617954</td>
-      <td>0.758958</td>
-      <td>0.750000</td>
-      <td>0.922550</td>
-      <td>0.971174</td>
-      <td>0.745113</td>
-      <td>0.767857</td>
-      <td>0.108787</td>
-      <td>0.077192</td>
-      <td>0.017394</td>
-      <td>0.005712</td>
-      <td>0.023499</td>
-      <td>0.038952</td>
-      <td>0.017485</td>
+      <td>0.779899</td>
+      <td>0.944223</td>
+      <td>0.842875</td>
+      <td>0.625532</td>
+      <td>0.773499</td>
+      <td>0.755284</td>
+      <td>0.921814</td>
+      <td>0.971427</td>
+      <td>0.743759</td>
+      <td>0.764393</td>
+      <td>0.076467</td>
+      <td>0.073468</td>
+      <td>0.018597</td>
+      <td>0.005673</td>
+      <td>0.024281</td>
+      <td>0.03211</td>
+      <td>0.017167</td>
     </tr>
     <tr>
       <th>recall</th>
-      <td>0.754762</td>
-      <td>0.958670</td>
-      <td>0.794725</td>
-      <td>0.164627</td>
-      <td>0.457760</td>
-      <td>0.619857</td>
-      <td>0.768354</td>
-      <td>0.991161</td>
-      <td>0.618494</td>
-      <td>0.307457</td>
-      <td>0.928571</td>
-      <td>0.684507</td>
-      <td>0.917293</td>
-      <td>0.804348</td>
-      <td>0.818182</td>
-      <td>0.807143</td>
-      <td>0.732558</td>
+      <td>0.745338</td>
+      <td>0.958143</td>
+      <td>0.793578</td>
+      <td>0.163515</td>
+      <td>0.447282</td>
+      <td>0.607335</td>
+      <td>0.760513</td>
+      <td>0.991227</td>
+      <td>0.620331</td>
+      <td>0.293837</td>
+      <td>0.921429</td>
+      <td>0.695775</td>
+      <td>0.894737</td>
+      <td>0.782609</td>
+      <td>0.863636</td>
+      <td>0.80000</td>
+      <td>0.744186</td>
     </tr>
     <tr>
       <th>support</th>
@@ -53146,7 +53355,7 @@ this F2 score is : 0.8542163487955893
       <td>133.000000</td>
       <td>46.000000</td>
       <td>44.000000</td>
-      <td>140.000000</td>
+      <td>140.00000</td>
       <td>86.000000</td>
     </tr>
   </tbody>
@@ -53162,12 +53371,12 @@ this F2 score is : 0.8542163487955893
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[51]:</div>
+<div class="prompt input_prompt">In&nbsp;[56]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#calc F2 score from that. </span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;this F2 score for this weird ensemble method is : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-    <span class="n">fbeta_score</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y_validation</span><span class="p">),</span> <span class="n">preds_all</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;samples&#39;</span><span class="p">)))</span>
+    <span class="n">fbeta_score</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y_validation_all</span><span class="p">),</span> <span class="n">preds_all</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;samples&#39;</span><span class="p">)))</span>
 </pre></div>
 
 </div>
@@ -53180,14 +53389,14 @@ this F2 score is : 0.8542163487955893
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>this F2 score for this weird ensemble method is : 0.2616229578226831
+<pre>this F2 score for this weird ensemble method is : 0.7573225088708905
 </pre>
 </div>
 </div>
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>C:\Users\clongo\AppData\Local\Continuum\Anaconda3\lib\site-packages\sklearn\metrics\classification.py:1113: UndefinedMetricWarning: F-score is ill-defined and being set to 0.0 in samples with no predicted labels.
+<pre>C:\Users\ablin\Anaconda3\lib\site-packages\sklearn\metrics\classification.py:1113: UndefinedMetricWarning: F-score is ill-defined and being set to 0.0 in samples with no predicted labels.
   &#39;precision&#39;, &#39;predicted&#39;, average, warn_for)
 </pre>
 </div>
