@@ -49,7 +49,7 @@ X = pd.read_pickle('X.pkl')
 y = pd.read_pickle('y.pkl')
 
 
-# In[195]:
+# In[5]:
 
 im_names = pickle.load('im_names.pkl', 'rb')
 tagged_df = pd.read_pickle('tagged_df.pkl')

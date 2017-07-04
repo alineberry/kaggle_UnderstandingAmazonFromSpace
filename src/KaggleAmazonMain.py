@@ -116,6 +116,32 @@ def load_training_data(sampleOnly=True, ftype='jpg'):
     y = pd.DataFrame(y)
     return X, y, im_names, tagged_df
 
+
+def load_test_data():
+    X = []
+    y = []
+    im_names = []
+    
+    print('Loading FULL {} image dataset')
+    cwd = os.getcwd()
+    path = os.path.join(cwd, '..', 'data','test-jpg')
+    files = glob.glob(path)
+    print('number of files: ', len(files))
+    i = 0
+    for fs in files:
+        i += 1
+        if i % 1000 == 0:
+            print('processing {} of {}'.format(i,len(files)))
+        img = img_as_float(imread(fs))
+        
+        X.append(get_features(img))
+        
+        imname = os.path.basename(fs).split('.')[0]
+        im_names.append(imname)
+    
+    X = pd.DataFrame(X)
+    return X
+
     
 def get_labels(fname, tagged_df):
     """return list of labels for a given filename"""

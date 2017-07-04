@@ -27,16 +27,15 @@ cwd = os.getcwd()
 path = os.path.join(cwd, '..', 'src')
 if not path in sys.path:
     sys.path.append(path)
-#del cwd, path
 import KaggleAmazonMain as kam
 
 
-# In[30]:
+# In[3]:
 
 reload(kam)
 
 
-# In[23]:
+# In[42]:
 
 #Load from pickle unless something has changed
 X = pd.read_pickle('X.pkl')
@@ -44,24 +43,29 @@ y = pd.read_pickle('y.pkl')
 X_sample, labels, names_train, tagged_df = kam.load_sample_training_data() #load sample data for plotting
 
 
-# In[24]:
+# In[43]:
+
+X.drop(['hough_skew','hough_kurtosis'], axis=1, inplace=True)
+
+
+# In[44]:
 
 X.head()
 
 
-# In[25]:
+# In[45]:
 
 y.head()
 
 
-# In[26]:
+# In[46]:
 
 print(X.shape, y.shape)
 
 
 # ## Exploratory plots
 
-# In[6]:
+# In[47]:
 
 #Barplot of tag counts
 get_ipython().magic('matplotlib inline')
@@ -74,12 +78,12 @@ def plot_sample_size(tagged_df):
 plot_sample_size(tagged_df)
 
 
-# In[7]:
+# In[48]:
 
 kam.plot_samples(X_sample, names_train, tagged_df, nrow=4, ncol=4)
 
 
-# In[8]:
+# In[49]:
 
 fig, axes = plt.subplots(1, 3, figsize=(10, 6))
 axes[0].imshow(X_sample[1,:,:,0], cmap='Reds')
@@ -87,7 +91,7 @@ axes[1].imshow(X_sample[1,:,:,1], cmap='Greens')
 axes[2].imshow(X_sample[1,:,:,2], cmap='Blues')
 
 
-# In[9]:
+# In[50]:
 
 plt.subplots_adjust(wspace=0, hspace=0)
 for i in range(0,3):
@@ -104,7 +108,7 @@ for i in range(0,3):
 # 
 # binned mode differences is a feature created to discribe bimodal distributions. A lot of the r g b distributions are bimodal, which could offer interesting insight into the  classificatioin, so I created a feature to capture bimodal patterns in the r g b pixel distributions. The binned mode differences is simply the differnce between the two min bounds of the two largest count bins, or the two modes. If this value is large, then the two larges modes are a large distance from eachother, indicating the distribution is bimodal.
 
-# In[11]:
+# In[51]:
 
 #Binned mode differences
 img=X_sample[2]
@@ -114,7 +118,7 @@ kam.binned_mode_features_with_diagnostics(img, steps)
 
 # Also created sobel features. blah blah blah about those
 
-# In[10]:
+# In[52]:
 
 from skimage.color import rgb2gray
 from skimage import transform, img_as_float, filters
@@ -126,31 +130,21 @@ for i in range(X_train_g.shape[0]):
 X_train_sobel = np.asarray(X_train_sobel)
 
 
-# In[11]:
+# In[53]:
 
 kam.plot_samples(X_train_sobel, names_train, tagged_df, 4,4)
 
 
 # Check out the features that were made... See if they describe separation of  classes. 
 
-# In[16]:
+# In[54]:
 
 sample_imgs_canny = kam.xform_to_canny(X_sample, sigma=.5)
 
 kam.plot_samples(sample_imgs_canny, names_train, tagged_df, 4,4)
 
 
-# In[22]:
-
-X
-
-
-# In[29]:
-
-y.index
-
-
-# In[32]:
+# In[55]:
 
 #create table of each feature histograms for each label
 X.set_index(y.index, inplace=True)
@@ -162,39 +156,93 @@ kam.plot_a_feature_by_labels('sobel_colmean_std', X, y)
 
 # # Random Forest
 
-# In[34]:
+# ## Search random forest hyperparameter space
+
+# In[ ]:
+
+f2_scorer_obj = make_scorer(fbeta_score, beta=2, average='samples')
+
+rf = RandomForestClassifier(bootstrap = True, 
+                            oob_score = False,
+                            n_jobs = -1,
+                            random_state = 14113
+                            )
+
+parameters = {
+    'n_estimators' : [100, 200, 300],
+    'max_features' : ['sqrt', 'log2', 1, 2, 0.5, None],
+    'class_weight' : ['balanced', 'balanced_subsample']
+}
+
+grid_search_obj = GridSearchCV(rf, parameters, scoring=f2_score, n_jobs=-1, cv=3)
+
+grid_search_obj.fit(X_train, y_train)
+
+
+# ### Persist grid search data -- *AS NEEDED*
+
+# In[ ]:
+
+grid_search_results = pd.DataFrame(grid_search.cv_results_)
+grid_search_results.to_pickle('grid_search_results_df.pkl')
+
+import pickle
+pickle.dump(grid_search, open('grid_search_object.pkl', "wb"))
+
+
+# ### Depersist grid search data -- *AS NEEDED*
+
+# In[60]:
+
+grid_search_results = pd.read_pickle('grid_search_results_df.pkl')
+
+
+# In[64]:
+
+grid_search_obj = pickle.load(open('grid_search_object.pkl', "rb"))
+
+
+# ### Print 'best estimator'
+
+# In[65]:
+
+grid_search_obj.best_estimator_
+
+
+# ## Fit Random Forest
+
+# In[56]:
 
 from sklearn.model_selection import train_test_split
 X_train, X_validation, y_train, y_validation = train_test_split(X, y, test_size=0.40, random_state=14113)
 
 
-# In[14]:
+# In[57]:
 
 y.sum() #these are the sample sizes per class
 
 
-# In[15]:
+# In[66]:
 
 from sklearn.ensemble import RandomForestClassifier
 
-rf = RandomForestClassifier(n_estimators = 100, 
-                            max_features = 'sqrt',
-                            bootstrap = True, 
-                            oob_score = True,
-                            n_jobs = -1,
-                            random_state = 14113,
-                            class_weight = 'balanced_subsample')
+rf = RandomForestClassifier(bootstrap=True, class_weight='balanced',
+            criterion='gini', max_depth=None, max_features=None,
+            max_leaf_nodes=None, min_impurity_split=1e-07,
+            min_samples_leaf=1, min_samples_split=2,
+            min_weight_fraction_leaf=0.0, n_estimators=300, n_jobs=-1,
+            oob_score=False, random_state=14113, verbose=0,
+            warm_start=False)
 
 
-# In[16]:
+# In[67]:
 
 rf.fit(X_train, y_train)
-print('The oob error for this random forest is {}'.format(rf.oob_score_.round(2)))
 
 
 # In[17]:
 
-#features ranking of features. 
+# features ranking 
 
 Feature_importance = pd.DataFrame(rf.feature_importances_, X_train.columns)
 def plot_feature_importance(Feature_importance, n):
@@ -217,10 +265,11 @@ plot_feature_importance(Feature_importance, 10)
 # In[18]:
 
 from sklearn.metrics import fbeta_score
-np.asarray(y_validation)
-
+probs = rf.predict_proba(X_validation)
+predictions = kam.get_prediction_matrix(probs, 0.25)
 predictions = rf.predict(X_validation)
-fbeta_score(np.asarray(y_validation), predictions, beta=2, average='samples')
+score = fbeta_score(np.asarray(y_validation), predictions, beta=2, average='samples')
+print('F2 score: ', score)
 
 
 # precision is  of the imgaes taggd with a particular class, how many times that was the right class. 
@@ -243,16 +292,6 @@ Metrics
 
 
 # Trying to show recall increases with sample size, but its hard to see all the small sample points because they are so clustered. Basically, recall for sample size less than 2000 is generally poor, so we will focus on those samples.
-
-# In[20]:
-
-#Plot recall by sample size
-# to show sample size thresh where recall is ok
-
-colors=cm.summer(np.linspace(0, 1, len(Metrics.ix['support'])))
-plt.scatter(Metrics.ix['support'], Metrics.ix['recall'], c=colors, alpha=0.5)
-plt.show()
-
 
 # ## Diagnostics
 
@@ -340,11 +379,6 @@ plot_decision_hist('bare_ground')
 # # Oversampling
 
 # The imbalanced-learn library imblearn has great modules for oversampling. WE are usign oeversampling because undersampling leads to loss of information, and some classes are very small so it would also lead to a very small dataset. Note oversampling can lead to overfitting the samller classes... Didn't work with multiclasses. I wrote my oen function for oversampling. It oversamples classes smaller than l up to size l by repeating a relabeled image the same as the randomly sampled image. 
-
-# In[44]:
-
-X.drop(['hough_skew','hough_kurtosis'], axis=1, inplace=True)
-
 
 # In[45]:
 
