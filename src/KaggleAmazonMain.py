@@ -122,9 +122,10 @@ def load_test_data():
     y = []
     im_names = []
     
-    print('Loading FULL {} image dataset')
+    print('Loading FULL test image dataset')
     cwd = os.getcwd()
-    path = os.path.join(cwd, '..', 'data','test-jpg')
+    path = os.path.join(cwd, '..', 'data','test-jpg', '*.jpg')
+    print(path)
     files = glob.glob(path)
     print('number of files: ', len(files))
     i = 0

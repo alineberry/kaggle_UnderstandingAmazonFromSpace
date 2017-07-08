@@ -1,9 +1,9 @@
 
 # coding: utf-8
 
-# # Exploratory Data Analysis
+# # Kaggle: Understanding the Amazon from Space
 
-# In[1]:
+# In[27]:
 
 import pandas as pd
 import numpy as np
@@ -17,6 +17,8 @@ from skimage import transform, img_as_float
 import glob
 import math
 from importlib import reload
+import pickle
+import glob
 
 
 # ## Import utility functions and load data
@@ -30,12 +32,12 @@ if not path in sys.path:
 import KaggleAmazonMain as kam
 
 
-# In[82]:
+# In[34]:
 
 reload(kam)
 
 
-# In[42]:
+# In[25]:
 
 #Load from pickle unless something has changed
 X = pd.read_pickle('X.pkl')
@@ -202,7 +204,7 @@ grid_search_results = pd.read_pickle('grid_search_results_df.pkl')
 grid_search_obj = pickle.load(open('grid_search_object.pkl', "rb"))
 
 
-# ### Print 'best estimator'
+# ### Best estimator:
 
 # In[68]:
 
@@ -269,13 +271,12 @@ rf.fit(X_upsampled, y_upsampled)
 
 # In[80]:
 
-import pickle
 pickle.dump(rf, open('rf_fitted.pkl', "wb"))
 
 
 # ### Depersist fitted model
 
-# In[ ]:
+# In[5]:
 
 rf = pickle.load(open('rf_fitted.pkl', "rb"))
 
@@ -309,7 +310,6 @@ plot_feature_importance(Feature_importance, 10)
 from sklearn.metrics import fbeta_score
 probs = rf.predict_proba(X_validation)
 predictions = kam.get_prediction_matrix(probs, 0.25)
-predictions = rf.predict(X_validation)
 score = fbeta_score(np.asarray(y_validation), predictions, beta=2, average='samples')
 print('F2 score: ', score)
 
@@ -417,12 +417,70 @@ plot_decision_hist('bare_ground')
 
 # ## Load test data
 
-# In[84]:
+# In[35]:
 
 X_test = kam.load_test_data()
 
 
+# In[36]:
+
+X_test.drop(['hough_skew','hough_kurtosis'], axis=1, inplace=True)
+
+
+# In[37]:
+
+X_test.to_pickle('X_test.pkl')
+
+
+# In[38]:
+
+X_test.head()
+
+
 # In[ ]:
 
+probs = rf.predict_proba(X_test)
+predictions = kam.get_prediction_matrix(probs, 0.25)
 
+
+# In[ ]:
+
+predictions_df = pd.DataFrameFrame(predictions, columns = ___labels___)
+
+
+# In[ ]:
+
+labels = ____ # an ordered list of labels corresponding to columns of 'predictions' matrix
+
+
+# In[ ]:
+
+def get_labels_from_predictions(row):
+    imlabs = []
+    for ind, val in row.iteritems():   # what is the series index?? maybe class labels? probably numbers - make sure contiguous
+        if val:
+            imlabs.append(labels[i])
+    imlabs = ','.join(imlabs)
+    return imlabs
+
+
+# In[ ]:
+
+results_df = predictions_df.apply(get_labels_from_predictions, axis=1)
+
+
+# In[ ]:
+
+results_df = pd.DataFrame(results_df, columns=['labels'])
+
+
+# In[ ]:
+
+results_df['fname'] = X_test.index
+results_df.set_index(['fname'], inplace=True, deleteold=True)
+
+
+# In[ ]:
+
+results_df.to_csv('')
 

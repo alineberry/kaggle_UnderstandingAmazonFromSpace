@@ -11751,13 +11751,13 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Exploratory-Data-Analysis">Exploratory Data Analysis<a class="anchor-link" href="#Exploratory-Data-Analysis">&#182;</a></h1>
+<h1 id="Kaggle:-Understanding-the-Amazon-from-Space">Kaggle: Understanding the Amazon from Space<a class="anchor-link" href="#Kaggle:-Understanding-the-Amazon-from-Space">&#182;</a></h1>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="prompt input_prompt">In&nbsp;[27]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -11772,6 +11772,8 @@ div#notebook {
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">importlib</span> <span class="k">import</span> <span class="n">reload</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">glob</span>
 </pre></div>
 
 </div>
@@ -11807,7 +11809,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[82]:</div>
+<div class="prompt input_prompt">In&nbsp;[34]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">reload</span><span class="p">(</span><span class="n">kam</span><span class="p">)</span>
@@ -11821,7 +11823,7 @@ div#notebook {
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[82]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[34]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
@@ -11836,7 +11838,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[42]:</div>
+<div class="prompt input_prompt">In&nbsp;[25]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Load from pickle unless something has changed</span>
@@ -11857,6 +11859,7 @@ div#notebook {
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>cwd C:\Users\ablin\Documents\Kaggle\kaggle_UnderstandingAmazonFromSpace\develop
 Loading jpg image dataset
+[&#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_0.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_1.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_100.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_1000.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10000.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10001.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10002.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10003.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10004.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10005.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10006.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10007.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10008.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10009.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_1001.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10010.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10011.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10012.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10013.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10014.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10015.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10016.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10017.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10018.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10019.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_1002.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10020.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10021.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10022.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10023.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10024.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10025.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10026.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10027.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10028.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10029.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_1003.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10030.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10031.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10032.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10033.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10034.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10035.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10036.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10037.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10038.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10039.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_1004.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10040.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10041.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10042.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10043.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10044.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10045.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10046.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10047.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10048.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10049.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_1005.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10050.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10051.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10052.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10053.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10054.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10055.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10056.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10057.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10058.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10059.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_1006.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10060.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10061.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10062.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10063.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10064.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10065.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10066.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10067.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10068.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10069.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_1007.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10070.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10071.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10072.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10073.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10074.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10075.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10076.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10077.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10078.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10079.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_1008.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10080.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10081.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10082.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10083.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10084.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_10085.jpg&#39;, &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\train-jpg-sample\\train_1009.jpg&#39;]
 </pre>
 </div>
 </div>
@@ -48434,7 +48437,7 @@ rkJggg==
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Print-'best-estimator'">Print 'best estimator'<a class="anchor-link" href="#Print-'best-estimator'">&#182;</a></h3>
+<h3 id="Best-estimator:">Best estimator:<a class="anchor-link" href="#Best-estimator:">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -48700,8 +48703,7 @@ dtype: int64</pre>
 <div class="prompt input_prompt">In&nbsp;[80]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pickle</span>
-<span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;rf_fitted.pkl&#39;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;rf_fitted.pkl&#39;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">))</span>
 </pre></div>
 
 </div>
@@ -48720,7 +48722,7 @@ dtype: int64</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">rf</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s1">&#39;rf_fitted.pkl&#39;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">))</span>
@@ -49009,7 +49011,6 @@ QmCC
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">fbeta_score</span>
 <span class="n">probs</span> <span class="o">=</span> <span class="n">rf</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_validation</span><span class="p">)</span>
 <span class="n">predictions</span> <span class="o">=</span> <span class="n">kam</span><span class="o">.</span><span class="n">get_prediction_matrix</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">)</span>
-<span class="n">predictions</span> <span class="o">=</span> <span class="n">rf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_validation</span><span class="p">)</span>
 <span class="n">score</span> <span class="o">=</span> <span class="n">fbeta_score</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y_validation</span><span class="p">),</span> <span class="n">predictions</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;samples&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;F2 score: &#39;</span><span class="p">,</span> <span class="n">score</span><span class="p">)</span>
 </pre></div>
@@ -50494,7 +50495,7 @@ SOKUCEREEqdEICKSOCUCEZHE/X8IlhkdLfPFHQAAAABJRU5ErkJggg==
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[84]:</div>
+<div class="prompt input_prompt">In&nbsp;[35]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">X_test</span> <span class="o">=</span> <span class="n">kam</span><span class="o">.</span><span class="n">load_test_data</span><span class="p">()</span>
@@ -50510,50 +50511,257 @@ SOKUCEREEqdEICKSOCUCEZHE/X8IlhkdLfPFHQAAAABJRU5ErkJggg==
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Loading FULL {} image dataset
-number of files:  1
+<pre>Loading FULL test image dataset
+C:\Users\ablin\Documents\Kaggle\kaggle_UnderstandingAmazonFromSpace\develop\..\data\test-jpg\*.jpg
+number of files:  40669
+processing 1000 of 40669
+processing 2000 of 40669
+processing 3000 of 40669
+processing 4000 of 40669
+processing 5000 of 40669
+processing 6000 of 40669
+processing 7000 of 40669
+processing 8000 of 40669
+processing 9000 of 40669
+processing 10000 of 40669
+processing 11000 of 40669
+processing 12000 of 40669
+processing 13000 of 40669
+processing 14000 of 40669
+processing 15000 of 40669
+processing 16000 of 40669
+processing 17000 of 40669
+processing 18000 of 40669
+processing 19000 of 40669
+processing 20000 of 40669
+processing 21000 of 40669
+processing 22000 of 40669
+processing 23000 of 40669
+processing 24000 of 40669
+processing 25000 of 40669
+processing 26000 of 40669
+processing 27000 of 40669
+processing 28000 of 40669
+processing 29000 of 40669
+processing 30000 of 40669
+processing 31000 of 40669
+processing 32000 of 40669
+processing 33000 of 40669
+processing 34000 of 40669
+processing 35000 of 40669
+processing 36000 of 40669
+processing 37000 of 40669
+processing 38000 of 40669
+processing 39000 of 40669
+processing 40000 of 40669
 </pre>
 </div>
 </div>
 
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_text output_error">
-<pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">PermissionError</span>                           Traceback (most recent call last)
-<span class="ansi-green-fg">&lt;ipython-input-84-470b054b1d09&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-fg">----&gt; 1</span><span class="ansi-red-fg"> </span>X_test <span class="ansi-yellow-intense-fg ansi-bold">=</span> kam<span class="ansi-yellow-intense-fg ansi-bold">.</span>load_test_data<span class="ansi-yellow-intense-fg ansi-bold">(</span><span class="ansi-yellow-intense-fg ansi-bold">)</span>
-
-<span class="ansi-green-fg">C:\Users\ablin\Documents\Kaggle\kaggle_UnderstandingAmazonFromSpace\develop\..\src\KaggleAmazonMain.py</span> in <span class="ansi-cyan-fg">load_test_data</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-intense-fg ansi-bold">    133</span>         <span class="ansi-green-intense-fg ansi-bold">if</span> i <span class="ansi-yellow-intense-fg ansi-bold">%</span> <span class="ansi-cyan-intense-fg ansi-bold">1000</span> <span class="ansi-yellow-intense-fg ansi-bold">==</span> <span class="ansi-cyan-intense-fg ansi-bold">0</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-intense-fg ansi-bold">    134</span>             print<span class="ansi-yellow-intense-fg ansi-bold">(</span><span class="ansi-blue-intense-fg ansi-bold">&#39;processing {} of {}&#39;</span><span class="ansi-yellow-intense-fg ansi-bold">.</span>format<span class="ansi-yellow-intense-fg ansi-bold">(</span>i<span class="ansi-yellow-intense-fg ansi-bold">,</span>len<span class="ansi-yellow-intense-fg ansi-bold">(</span>files<span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-fg">--&gt; 135</span><span class="ansi-red-fg">         </span>img <span class="ansi-yellow-intense-fg ansi-bold">=</span> img_as_float<span class="ansi-yellow-intense-fg ansi-bold">(</span>imread<span class="ansi-yellow-intense-fg ansi-bold">(</span>fs<span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    136</span> 
-<span class="ansi-green-intense-fg ansi-bold">    137</span>         X<span class="ansi-yellow-intense-fg ansi-bold">.</span>append<span class="ansi-yellow-intense-fg ansi-bold">(</span>get_features<span class="ansi-yellow-intense-fg ansi-bold">(</span>img<span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">)</span>
-
-<span class="ansi-green-fg">C:\Users\ablin\Anaconda3\lib\site-packages\skimage\io\_io.py</span> in <span class="ansi-cyan-fg">imread</span><span class="ansi-blue-fg">(fname, as_grey, plugin, flatten, **plugin_args)</span>
-<span class="ansi-green-intense-fg ansi-bold">     59</span> 
-<span class="ansi-green-intense-fg ansi-bold">     60</span>     <span class="ansi-green-intense-fg ansi-bold">with</span> file_or_url_context<span class="ansi-yellow-intense-fg ansi-bold">(</span>fname<span class="ansi-yellow-intense-fg ansi-bold">)</span> <span class="ansi-green-intense-fg ansi-bold">as</span> fname<span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-fg">---&gt; 61</span><span class="ansi-red-fg">         </span>img <span class="ansi-yellow-intense-fg ansi-bold">=</span> call_plugin<span class="ansi-yellow-intense-fg ansi-bold">(</span><span class="ansi-blue-intense-fg ansi-bold">&#39;imread&#39;</span><span class="ansi-yellow-intense-fg ansi-bold">,</span> fname<span class="ansi-yellow-intense-fg ansi-bold">,</span> plugin<span class="ansi-yellow-intense-fg ansi-bold">=</span>plugin<span class="ansi-yellow-intense-fg ansi-bold">,</span> <span class="ansi-yellow-intense-fg ansi-bold">**</span>plugin_args<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-intense-fg ansi-bold">     62</span> 
-<span class="ansi-green-intense-fg ansi-bold">     63</span>     <span class="ansi-green-intense-fg ansi-bold">if</span> <span class="ansi-green-intense-fg ansi-bold">not</span> hasattr<span class="ansi-yellow-intense-fg ansi-bold">(</span>img<span class="ansi-yellow-intense-fg ansi-bold">,</span> <span class="ansi-blue-intense-fg ansi-bold">&#39;ndim&#39;</span><span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-
-<span class="ansi-green-fg">C:\Users\ablin\Anaconda3\lib\site-packages\skimage\io\manage_plugins.py</span> in <span class="ansi-cyan-fg">call_plugin</span><span class="ansi-blue-fg">(kind, *args, **kwargs)</span>
-<span class="ansi-green-intense-fg ansi-bold">    209</span>                                (plugin, kind))
-<span class="ansi-green-intense-fg ansi-bold">    210</span> 
-<span class="ansi-green-fg">--&gt; 211</span><span class="ansi-red-fg">     </span><span class="ansi-green-intense-fg ansi-bold">return</span> func<span class="ansi-yellow-intense-fg ansi-bold">(</span><span class="ansi-yellow-intense-fg ansi-bold">*</span>args<span class="ansi-yellow-intense-fg ansi-bold">,</span> <span class="ansi-yellow-intense-fg ansi-bold">**</span>kwargs<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-intense-fg ansi-bold">    212</span> 
-<span class="ansi-green-intense-fg ansi-bold">    213</span> 
-
-<span class="ansi-green-fg">C:\Users\ablin\Anaconda3\lib\site-packages\skimage\io\_plugins\pil_plugin.py</span> in <span class="ansi-cyan-fg">imread</span><span class="ansi-blue-fg">(fname, dtype, img_num, **kwargs)</span>
-<span class="ansi-green-intense-fg ansi-bold">     33</span>     &#34;&#34;&#34;
-<span class="ansi-green-intense-fg ansi-bold">     34</span>     <span class="ansi-green-intense-fg ansi-bold">if</span> isinstance<span class="ansi-yellow-intense-fg ansi-bold">(</span>fname<span class="ansi-yellow-intense-fg ansi-bold">,</span> string_types<span class="ansi-yellow-intense-fg ansi-bold">)</span><span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-fg">---&gt; 35</span><span class="ansi-red-fg">         </span><span class="ansi-green-intense-fg ansi-bold">with</span> open<span class="ansi-yellow-intense-fg ansi-bold">(</span>fname<span class="ansi-yellow-intense-fg ansi-bold">,</span> <span class="ansi-blue-intense-fg ansi-bold">&#39;rb&#39;</span><span class="ansi-yellow-intense-fg ansi-bold">)</span> <span class="ansi-green-intense-fg ansi-bold">as</span> f<span class="ansi-yellow-intense-fg ansi-bold">:</span>
-<span class="ansi-green-intense-fg ansi-bold">     36</span>             im <span class="ansi-yellow-intense-fg ansi-bold">=</span> Image<span class="ansi-yellow-intense-fg ansi-bold">.</span>open<span class="ansi-yellow-intense-fg ansi-bold">(</span>f<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-<span class="ansi-green-intense-fg ansi-bold">     37</span>             <span class="ansi-green-intense-fg ansi-bold">return</span> pil_to_ndarray<span class="ansi-yellow-intense-fg ansi-bold">(</span>im<span class="ansi-yellow-intense-fg ansi-bold">,</span> dtype<span class="ansi-yellow-intense-fg ansi-bold">=</span>dtype<span class="ansi-yellow-intense-fg ansi-bold">,</span> img_num<span class="ansi-yellow-intense-fg ansi-bold">=</span>img_num<span class="ansi-yellow-intense-fg ansi-bold">)</span>
-
-<span class="ansi-red-fg">PermissionError</span>: [Errno 13] Permission denied: &#39;C:\\Users\\ablin\\Documents\\Kaggle\\kaggle_UnderstandingAmazonFromSpace\\develop\\..\\data\\test-jpg&#39;</pre>
 </div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[36]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X_test</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;hough_skew&#39;</span><span class="p">,</span><span class="s1">&#39;hough_kurtosis&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[37]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X_test</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span><span class="s1">&#39;X_test.pkl&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[38]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X_test</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[38]:</div>
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>b_bimodal</th>
+      <th>b_kurtosis</th>
+      <th>b_max</th>
+      <th>b_mean</th>
+      <th>b_min</th>
+      <th>b_skew</th>
+      <th>b_std</th>
+      <th>canny_colmean_std</th>
+      <th>canny_kurtosis</th>
+      <th>canny_max</th>
+      <th>...</th>
+      <th>r_skew</th>
+      <th>r_std</th>
+      <th>sobel_colmean_std</th>
+      <th>sobel_kurtosis</th>
+      <th>sobel_max</th>
+      <th>sobel_mean</th>
+      <th>sobel_min</th>
+      <th>sobel_rowmean_std</th>
+      <th>sobel_skew</th>
+      <th>sobel_std</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.01</td>
+      <td>0.851991</td>
+      <td>0.333333</td>
+      <td>0.273076</td>
+      <td>0.231373</td>
+      <td>0.208575</td>
+      <td>0.010085</td>
+      <td>0.029219</td>
+      <td>1165.286570</td>
+      <td>True</td>
+      <td>...</td>
+      <td>0.370551</td>
+      <td>0.018836</td>
+      <td>0.005047</td>
+      <td>1.534163</td>
+      <td>0.044017</td>
+      <td>0.008361</td>
+      <td>0.0</td>
+      <td>0.001180</td>
+      <td>0.974235</td>
+      <td>0.005047</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.02</td>
+      <td>1.108828</td>
+      <td>0.341176</td>
+      <td>0.190250</td>
+      <td>0.105882</td>
+      <td>0.224533</td>
+      <td>0.023674</td>
+      <td>0.416172</td>
+      <td>-0.226291</td>
+      <td>True</td>
+      <td>...</td>
+      <td>0.310041</td>
+      <td>0.031820</td>
+      <td>0.012468</td>
+      <td>0.611794</td>
+      <td>0.092114</td>
+      <td>0.021668</td>
+      <td>0.0</td>
+      <td>0.002483</td>
+      <td>0.758591</td>
+      <td>0.012468</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.02</td>
+      <td>7.507349</td>
+      <td>0.886275</td>
+      <td>0.252798</td>
+      <td>0.117647</td>
+      <td>2.830106</td>
+      <td>0.145554</td>
+      <td>0.324097</td>
+      <td>3.520264</td>
+      <td>True</td>
+      <td>...</td>
+      <td>2.311977</td>
+      <td>0.164724</td>
+      <td>0.014492</td>
+      <td>8.490768</td>
+      <td>0.157153</td>
+      <td>0.017183</td>
+      <td>0.0</td>
+      <td>0.005157</td>
+      <td>2.103847</td>
+      <td>0.014492</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.01</td>
+      <td>15.981561</td>
+      <td>0.717647</td>
+      <td>0.189775</td>
+      <td>0.101961</td>
+      <td>3.828523</td>
+      <td>0.054709</td>
+      <td>0.273690</td>
+      <td>7.349979</td>
+      <td>True</td>
+      <td>...</td>
+      <td>3.731571</td>
+      <td>0.091092</td>
+      <td>0.019664</td>
+      <td>25.027723</td>
+      <td>0.223360</td>
+      <td>0.018843</td>
+      <td>0.0</td>
+      <td>0.002363</td>
+      <td>4.352235</td>
+      <td>0.019664</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.02</td>
+      <td>1.688701</td>
+      <td>0.552941</td>
+      <td>0.356420</td>
+      <td>0.290196</td>
+      <td>1.609825</td>
+      <td>0.037649</td>
+      <td>0.117459</td>
+      <td>66.482021</td>
+      <td>True</td>
+      <td>...</td>
+      <td>1.765546</td>
+      <td>0.091583</td>
+      <td>0.008882</td>
+      <td>27.450728</td>
+      <td>0.119170</td>
+      <td>0.011142</td>
+      <td>0.0</td>
+      <td>0.001408</td>
+      <td>3.815060</td>
+      <td>0.008882</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 42 columns</p>
+</div>
+</div>
+
 </div>
 
 </div>
@@ -50565,7 +50773,106 @@ number of files:  1
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">probs</span> <span class="o">=</span> <span class="n">rf</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="n">predictions</span> <span class="o">=</span> <span class="n">kam</span><span class="o">.</span><span class="n">get_prediction_matrix</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">predictions_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrameFrame</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">___labels___</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">labels</span> <span class="o">=</span> <span class="n">____</span> <span class="c1"># an ordered list of labels corresponding to columns of &#39;predictions&#39; matrix</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_labels_from_predictions</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+    <span class="n">imlabs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">row</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>   <span class="c1"># what is the series index?? maybe class labels? probably numbers - make sure contiguous</span>
+        <span class="k">if</span> <span class="n">val</span><span class="p">:</span>
+            <span class="n">imlabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="n">imlabs</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">imlabs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">imlabs</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">results_df</span> <span class="o">=</span> <span class="n">predictions_df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">get_labels_from_predictions</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">results_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results_df</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">results_df</span><span class="p">[</span><span class="s1">&#39;fname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">index</span>
+<span class="n">results_df</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;fname&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">deleteold</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">results_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
 </pre></div>
 
 </div>
