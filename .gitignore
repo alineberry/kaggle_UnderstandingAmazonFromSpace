@@ -3,3 +3,4 @@ data/
 *.pyc
 src/__pycache__/
 *.pkl
+*.csv

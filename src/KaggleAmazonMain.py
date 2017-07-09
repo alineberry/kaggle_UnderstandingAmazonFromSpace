@@ -124,7 +124,7 @@ def load_test_data():
     
     print('Loading FULL test image dataset')
     cwd = os.getcwd()
-    path = os.path.join(cwd, '..', 'data','test-jpg', '*.jpg')
+    path = os.path.join(cwd, '..', 'data','test-jpg-additional', '*.jpg')
     print(path)
     files = glob.glob(path)
     print('number of files: ', len(files))
@@ -140,7 +140,7 @@ def load_test_data():
         imname = os.path.basename(fs).split('.')[0]
         im_names.append(imname)
     
-    X = pd.DataFrame(X)
+    X = pd.DataFrame(X, index=im_names)
     return X
 
     
