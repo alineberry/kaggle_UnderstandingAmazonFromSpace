@@ -427,85 +427,34 @@ X_test = kam.load_test_data()
 X_test.drop(['hough_skew','hough_kurtosis'], axis=1, inplace=True)
 
 
-# ### TEMPORARY FIXING CELLS:
-# 
-# GET IMAGE NAMES BECAUSE FORGOT TO RETURN THIS FROM FUNCTION
-# 
-# DELETE ME!!!
-
-# In[36]:
-
-im_names = []
-cwd = os.getcwd()
-path = os.path.join(cwd, '..', 'data','test-jpg', '*.jpg')
-print(path)
-files = glob.glob(path)
-print('number of files: ', len(files))
-i = 0
-for fs in files:
-    i += 1
-    if i % 10000 == 0:
-        print('processing {} of {}'.format(i,len(files)))
-    imname = os.path.basename(fs).split('.')[0]
-    im_names.append(imname)
-
-
-# In[38]:
-
-X_test['imnames'] = im_names
-X_test.set_index(['imnames'], inplace=True, drop=True)
-
-
-# In[ ]:
-
-X_test_2 = kam.load_test_data()
-
-
-# In[ ]:
-
-X_test_2.drop(['hough_skew','hough_kurtosis'], axis=1, inplace=True)
-
-
-# In[ ]:
-
-X_test_1 = X_test
-X_test = pd.concat([X_test_1, X_test_2])
-
-
 # #### PERSIST
 
-# In[ ]:
+# In[58]:
 
 X_test.to_pickle('X_test.pkl')
 
 
 # #### DEPERSIST
 
-# In[ ]:
-
-
-
-
-# In[ ]:
-
-
-
-
 # In[4]:
 
 X_test = pd.read_pickle('X_test.pkl')
 
 
-# In[5]:
+# In[65]:
 
 X_test.head()
 
 
-# In[6]:
+# ## Make predictions
+
+# In[66]:
 
 probs = rf.predict_proba(X_test)
 predictions = kam.get_prediction_matrix(probs, 0.25)
 
+
+# ## Build submission file
 
 # In[12]:
 
@@ -517,50 +466,50 @@ _, _, _, tagged_df = kam.load_sample_training_data()
 labels = list(tagged_df.columns)
 
 
-# In[18]:
+# In[67]:
 
 predictions_df = pd.DataFrame(predictions, columns = labels)
 
 
-# In[46]:
+# In[68]:
 
 def get_labels_from_predictions(row):
     imlabs = []
-    for ind, val in row.iteritems():   # what is the series index?? maybe class labels? probably numbers - make sure contiguous
+    for ind, val in row.iteritems():
         if val:
             imlabs.append(ind)
     imlabs = ' '.join(imlabs)
     return imlabs
 
 
-# In[47]:
+# In[69]:
 
 results_df = predictions_df.apply(get_labels_from_predictions, axis=1)
 
 
-# In[48]:
+# In[70]:
 
 results_df = pd.DataFrame(results_df, columns=['tags'])
 
 
-# In[49]:
+# In[71]:
 
 results_df.head()
 
 
-# In[50]:
+# In[72]:
 
 results_df['image_name'] = X_test.index
 results_df.set_index(['image_name'], inplace=True, drop=True)
 
 
-# In[52]:
+# In[74]:
+
+results_df.shape
+
+
+# In[73]:
 
 import csv
 results_df.to_csv('results.csv', quoting=csv.QUOTE_NONE)
-
-
-# In[45]:
-
-results_df.shape
 
